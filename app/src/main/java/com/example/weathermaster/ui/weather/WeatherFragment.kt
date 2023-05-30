@@ -1,4 +1,4 @@
-package com.example.weathermaster.weather
+package com.example.weathermaster.ui.weather
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -24,6 +24,18 @@ class WeatherFragment : Fragment() {
     ): View {
         _binding = FragmentWeatherBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupSettingsClickListener()
+    }
+
+    private fun setupSettingsClickListener() {
+        binding.settings.setOnClickListener {
+
+
+        }
     }
 
     override fun onDestroyView() {

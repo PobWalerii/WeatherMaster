@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="city_title_size">22sp</dimen>
+    <dimen name="margin_city_title_top">25dp</dimen>
+    <dimen name="margin_settings_end">25dp</dimen>
+
+</resources>
