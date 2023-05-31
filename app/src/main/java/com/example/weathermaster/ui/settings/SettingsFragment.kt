@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.weathermaster.R
 import com.example.weathermaster.databinding.FragmentSettingsBinding
+import com.example.weathermaster.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +28,8 @@ class SettingsFragment : Fragment() {
 
     private val viewModel by viewModels<SettingsViewModel>()
 
-    @Inject
-    lateinit var actionBar: AppActionBar
+    //@Inject
+    //lateinit var actionBar: AppActionBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +41,7 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupActionBar()
+        setupBackClickListener()
         observeSettingsLoaded()
         setListenersSettingsChanged()
     }
@@ -55,6 +56,14 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun setupBackClickListener() {
+        binding.arrow.setOnClickListener {
+            (activity as MainActivity).onSupportNavigateUp()
+        }
+    }
+
+
+/*
     private fun setupActionBar() {
 
         actionBar.initAppbar(
@@ -78,6 +87,8 @@ class SettingsFragment : Fragment() {
         }
     }
 
+ */
+/*
     private fun setSettingsToDefault() {
         showConfirmationDialog(
             R.string.restoring_settings,
@@ -89,8 +100,10 @@ class SettingsFragment : Fragment() {
             onCancelled = { }
         )
     }
+    */
 
     private fun showSettings() {
+        /*
         binding.firstRun = viewModel.firstRun.value
         binding.defaultHeader = viewModel.defaultHeader.value
         binding.specificationLine = viewModel.specificationLine.value
@@ -104,16 +117,20 @@ class SettingsFragment : Fragment() {
         binding.operationDelayValue = viewModel.operationDelayValue.value
         binding.createBackgroundRecords = viewModel.createBackgroundRecords.value
         binding.intervalCreateRecords = viewModel.intervalCreateRecords.value
+
+         */
     }
 
-    private fun setListenersSettingsChanged() {
 
+
+    private fun setListenersSettingsChanged() {
+/*
         val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            if(buttonView==binding.switch7) {
-                binding.intervalCreate.isEnabled = isChecked
-            }
+            //if(buttonView==binding.switch7) {
+            //    binding.intervalCreate.isEnabled = isChecked
+            //}
             definitionOfChange()
-            hideKeyboardFromView(requireActivity(), requireView())
+            //hideKeyboardFromView(requireActivity(), requireView())
         }
         binding.switch1.setOnCheckedChangeListener(changeListener)
         binding.switch2.setOnCheckedChangeListener(changeListener)
@@ -139,14 +156,17 @@ class SettingsFragment : Fragment() {
         binding.requestInterval.addTextChangedListener(textWatcher)
         binding.operationDelay.addTextChangedListener(textWatcher)
         binding.intervalCreate.addTextChangedListener(textWatcher)
+
+ */
     }
 
-    internal fun definitionOfChange() {
-        actionBar.setButtonVisible("save", getIsChange())
-    }
+    //internal fun definitionOfChange() {
+    //    actionBar.setButtonVisible("save", getIsChange())
+    //}
 
     private fun getIsChange(): Boolean =
         viewModel.isChange(
+            /*
             binding.switch6.isChecked,
             binding.header.text.toString(),
             binding.switch1.isChecked,
@@ -160,9 +180,12 @@ class SettingsFragment : Fragment() {
             binding.operationDelay.text.toString(),
             binding.switch7.isChecked,
             binding.intervalCreate.text.toString()
+
+             */
         )
 
     private fun saveSettings() {
+        /*
         viewModel.savePreferences(
             binding.switch6.isChecked,
             binding.header.text.toString(),
@@ -181,17 +204,19 @@ class SettingsFragment : Fragment() {
             intervalCreateRecords = binding.intervalCreate.text.toString().toIntOrNull() ?: 0
         )
         definitionOfChange()
+
+         */
     }
 
     override fun onStop() {
         super.onStop()
-        hideKeyboardFromView(requireContext(),requireView())
+        //hideKeyboardFromView(requireContext(),requireView())
     }
 
 
     override fun onResume() {
         super.onResume()
-        definitionOfChange()
+        //definitionOfChange()
     }
 
     override fun onDestroyView() {

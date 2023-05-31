@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="city_title_size">22sp</dimen>
-    <dimen name="margin_city_title_top">25dp</dimen>
-    <dimen name="margin_settings_end">25dp</dimen>
-
+    <dimen name="title_size">22sp</dimen>
+    <dimen name="margin_title_top">25dp</dimen>
+    <dimen name="margin_image_horisontal">25dp</dimen>
+    <dimen name="margin_settings_vertical">10dp</dimen>
+    <dimen name="settings_text_size">20sp</dimen>
+    <dimen name="settings_comment_size">15sp</dimen>
 </resources>

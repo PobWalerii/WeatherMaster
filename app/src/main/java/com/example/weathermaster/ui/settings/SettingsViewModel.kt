@@ -1,7 +1,7 @@
 package com.example.weathermaster.ui.settings
 
 import androidx.lifecycle.ViewModel
-import com.example.notesapp.settings.AppSettings
+import com.example.weathermaster.settings.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -10,7 +10,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val appSettings: AppSettings
 ): ViewModel() {
-
+/*
     val firstRun: StateFlow<Boolean> = appSettings.firstRun
     val defaultHeader: StateFlow<String> = appSettings.defaultHeader
     val specificationLine: StateFlow<Boolean> = appSettings.specificationLine
@@ -25,17 +25,20 @@ class SettingsViewModel @Inject constructor(
     val createBackgroundRecords: StateFlow<Boolean> = appSettings.createBackgroundRecords
     val intervalCreateRecords: StateFlow<Int> = appSettings.intervalCreateRecords
 
+ */
+
     var isLoadedPreferences: StateFlow<Boolean> = appSettings.isLoadedPreferences
 
-    init {
-        appSettings.showViewForSnack = null
-    }
+    //init {
+    //    appSettings.showViewForSnack = null
+    //}
 
-    fun setDefaultPreferences() {
-        appSettings.setDefaultPreferences()
-    }
+    //fun setDefaultPreferences() {
+    //    appSettings.setDefaultPreferences()
+    //}
 
     fun savePreferences(
+        /*
         firstRun: Boolean,
         defaultHeader: String,
         specificationLine: Boolean,
@@ -49,7 +52,10 @@ class SettingsViewModel @Inject constructor(
         operationDelayValue: Int,
         createBackgroundRecords: Boolean,
         intervalCreateRecords: Int
+
+         */
     ) {
+        /*
         appSettings.savePreferences(
             firstRun,
             defaultHeader,
@@ -65,9 +71,12 @@ class SettingsViewModel @Inject constructor(
             createBackgroundRecords,
             intervalCreateRecords
         )
+
+         */
     }
 
     fun isChange(
+        /*
         _firstRun: Boolean,
         _defaultHeader: String,
         _specificationLine: Boolean,
@@ -81,7 +90,11 @@ class SettingsViewModel @Inject constructor(
         _operationDelayValue: String,
         _createBackgroundRecords: Boolean,
         _intervalCreateRecords: String
+
+         */
     ): Boolean {
+        return false
+        /*
         return  firstRun.value != _firstRun ||
                 defaultHeader.value != _defaultHeader ||
                 specificationLine.value != _specificationLine ||
@@ -95,5 +108,7 @@ class SettingsViewModel @Inject constructor(
                 operationDelayValue.value.toString() != _operationDelayValue ||
                 createBackgroundRecords.value != _createBackgroundRecords ||
                 intervalCreateRecords.value.toString() != _intervalCreateRecords
+
+         */
     }
 }

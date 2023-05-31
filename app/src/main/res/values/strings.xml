@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">WeatherMaster</string>
+    <string name="settings">Settings</string>
+    <string name="measurement">Units of measurement:</string>
+    <string name="temperature_Fahrenheit">temperature in Fahrenheit</string>
+    <string name="temperature_Celsius">temperature in Celsius</string>
+    <string name="temperature_Kelvin">temperature in Kelvin</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
