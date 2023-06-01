@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.weathermaster.R
+import com.example.weathermaster.utils.KeyConstants.MEASUREMENT1
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +15,11 @@ import javax.inject.Singleton
 class AppSettings(
     private val applicationContext: Context
 ) {
+
+    private val _measurement = MutableStateFlow(MEASUREMENT1)
+    val measurement: StateFlow<String> = _measurement.asStateFlow()
+
+
     //private val _firstLoad = MutableStateFlow(true)
     //val firstLoad: StateFlow<Boolean> = _firstLoad.asStateFlow()
 
@@ -85,6 +92,12 @@ class AppSettings(
         //setFirstLoad(true)
     }
 
+    //fun setFirstLoad(isStart: Boolean = false) {
+        //_firstLoad.value = isStart
+    //}
+
+
+
     //fun setAppFirstRun() {
     //    val ed: SharedPreferences.Editor = sPref.edit()
     //    ed.putBoolean("firstRun", false)
@@ -115,6 +128,8 @@ class AppSettings(
     private fun getPreferences() {
         _isLoadedPreferences.value = false
 
+        _measurement.value = sPref.getString("measurement", MEASUREMENT1).toString()
+
         //_firstRun.value = sPref.getBoolean("firstRun", SING_OF_FIRST_RUN)
         //_defaultHeader.value = sPref.getString("defaultHeader", DEFAULT_HEADER).toString()
         //_specificationLine.value =
@@ -137,6 +152,8 @@ class AppSettings(
     }
 
     fun savePreferences(
+        measurement: String,
+
         //firstRun: Boolean,
         //defaultHeader: String,
         //specificationLine: Boolean,
@@ -153,6 +170,8 @@ class AppSettings(
         //getDefault: Boolean = false
     ) {
         val ed: SharedPreferences.Editor = sPref.edit()
+        ed.putString("measurement", measurement)
+
         //ed.putBoolean("firstRun", firstRun)
         //ed.putString("defaultHeader", defaultHeader.ifEmpty { DEFAULT_HEADER })
         //ed.putBoolean("specificationLine", specificationLine)
@@ -167,32 +186,10 @@ class AppSettings(
         //ed.putBoolean("createBackgroundRecords", createBackgroundRecords)
         //ed.putInt("intervalCreateRecords", if(intervalCreateRecords>=MIN_INTERVAL_BACKGROUND_CREATE) intervalCreateRecords else MIN_INTERVAL_BACKGROUND_CREATE)
         ed.apply()
-        //Toast.makeText(
-        //    applicationContext, applicationContext.getString(
-        //        if (getDefault) R.string.settings_to_default else R.string.settings_is_saved
-        //    ), Toast.LENGTH_SHORT
-        //).show()
+        Toast.makeText(
+            applicationContext, applicationContext.getString(R.string.settings_is_saved), Toast.LENGTH_SHORT
+        ).show()
         getPreferences()
     }
-
-    fun setDefaultPreferences() {
-        //savePreferences(
-        //    SING_OF_FIRST_RUN,
-        //    DEFAULT_HEADER,
-        //    DEFAULT_SPECIFICATION_LINE,
-        //    DEFAULT_ADD_IF_CLICK,
-        //    DELETE_IF_SWIPED,
-        //    DATE_CHANGE_WHEN_CONTENT,
-        //    SHOW_MESSAGE_INTERNET_OK,
-        //    TIME_DELAY_START,
-        //    TIME_DELAY_QUERY,
-        //    INTERVAL_REQUESTS,
-        //    TIME_DELAY_OPERATION,
-        //    CREATE_RECORDS_IN_BACKGROUND,
-        //    INTERVAL_BACKGROUND_CREATE,
-        //    getDefault = true
-        //)
-    }
-
 
 }

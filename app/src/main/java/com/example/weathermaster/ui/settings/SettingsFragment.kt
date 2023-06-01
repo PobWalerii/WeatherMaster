@@ -1,23 +1,23 @@
 package com.example.weathermaster.ui.settings
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.weathermaster.R
 import com.example.weathermaster.databinding.FragmentSettingsBinding
 import com.example.weathermaster.ui.main.MainActivity
+import com.example.weathermaster.utils.KeyConstants.MEASUREMENT1
+import com.example.weathermaster.utils.KeyConstants.MEASUREMENT2
+import com.example.weathermaster.utils.KeyConstants.MEASUREMENT3
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 
 @AndroidEntryPoint
@@ -27,9 +27,6 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by viewModels<SettingsViewModel>()
-
-    //@Inject
-    //lateinit var actionBar: AppActionBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +39,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBackClickListener()
+        setupSaveClickListener()
         observeSettingsLoaded()
         setListenersSettingsChanged()
     }
@@ -62,47 +60,15 @@ class SettingsFragment : Fragment() {
         }
     }
 
-
-/*
-    private fun setupActionBar() {
-
-        actionBar.initAppbar(
-            requireActivity(),
-            R.string.settings,
-            viewLifecycleOwner,
-            toDefault = true
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            actionBar.isItemMenuPressed.collect {
-                CoroutineScope(Dispatchers.Main).launch {
-                    hideKeyboardFromView(requireActivity(), requireView())
-                    if (it == "save") {
-                        saveSettings()
-                    } else if (it == "todefault") {
-                        setSettingsToDefault()
-                    }
-                }
-            }
+    private fun setupSaveClickListener() {
+        binding.save.setOnClickListener {
+            saveSettings()
         }
     }
 
- */
-/*
-    private fun setSettingsToDefault() {
-        showConfirmationDialog(
-            R.string.restoring_settings,
-            R.string.text_restoring,
-            requireContext(),
-            onConfirmed = {
-                viewModel.setDefaultPreferences()
-            },
-            onCancelled = { }
-        )
-    }
-    */
-
     private fun showSettings() {
+        Toast.makeText(context,"${viewModel.measurement.value}",Toast.LENGTH_LONG).show()
+        binding.measurement = viewModel.measurement.value
         /*
         binding.firstRun = viewModel.firstRun.value
         binding.defaultHeader = viewModel.defaultHeader.value
@@ -117,55 +83,52 @@ class SettingsFragment : Fragment() {
         binding.operationDelayValue = viewModel.operationDelayValue.value
         binding.createBackgroundRecords = viewModel.createBackgroundRecords.value
         binding.intervalCreateRecords = viewModel.intervalCreateRecords.value
-
          */
     }
 
 
 
     private fun setListenersSettingsChanged() {
-/*
-        val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            //if(buttonView==binding.switch7) {
-            //    binding.intervalCreate.isEnabled = isChecked
-            //}
+        binding.switch1.setOnClickListener {
+            binding.measurement = MEASUREMENT1
             definitionOfChange()
-            //hideKeyboardFromView(requireActivity(), requireView())
+        }
+        binding.switch2.setOnClickListener {
+            binding.measurement = MEASUREMENT2
+            definitionOfChange()
+        }
+        binding.switch3.setOnClickListener {
+            binding.measurement = MEASUREMENT3
+            definitionOfChange()
+        }
+
+ /*
+
+        val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            if(buttonView == binding.switch1 || buttonView == binding.switch2 || buttonView == binding.switch3) {
+                binding.measurement = when(buttonView) {
+                    binding.switch2 -> MEASUREMENT2
+                    binding.switch3 -> MEASUREMENT3
+                    else -> MEASUREMENT1
+                }
+            }
+            //definitionOfChange()
         }
         binding.switch1.setOnCheckedChangeListener(changeListener)
         binding.switch2.setOnCheckedChangeListener(changeListener)
         binding.switch3.setOnCheckedChangeListener(changeListener)
-        binding.switch4.setOnCheckedChangeListener(changeListener)
-        binding.switch5.setOnCheckedChangeListener(changeListener)
-        binding.switch6.setOnCheckedChangeListener(changeListener)
-        binding.switch7.setOnCheckedChangeListener(changeListener)
 
-        val textWatcher = object : TextWatcher {
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                definitionOfChange()
-            }
-        }
-        binding.header.addTextChangedListener(textWatcher)
-        binding.startDelay.addTextChangedListener(textWatcher)
-        binding.queryDelay.addTextChangedListener(textWatcher)
-        binding.requestInterval.addTextChangedListener(textWatcher)
-        binding.operationDelay.addTextChangedListener(textWatcher)
-        binding.intervalCreate.addTextChangedListener(textWatcher)
-
- */
+  */
     }
 
-    //internal fun definitionOfChange() {
-    //    actionBar.setButtonVisible("save", getIsChange())
-    //}
+    internal fun definitionOfChange() {
+        binding.isEdited = getIsChange()
+    }
 
     private fun getIsChange(): Boolean =
         viewModel.isChange(
+            getMeasurementValue()
+
             /*
             binding.switch6.isChecked,
             binding.header.text.toString(),
@@ -180,13 +143,20 @@ class SettingsFragment : Fragment() {
             binding.operationDelay.text.toString(),
             binding.switch7.isChecked,
             binding.intervalCreate.text.toString()
-
              */
         )
 
+    private fun getMeasurementValue(): String = when {
+        binding.switch2.isChecked -> MEASUREMENT2
+        binding.switch3.isChecked -> MEASUREMENT3
+        else -> MEASUREMENT1
+    }
+
     private fun saveSettings() {
-        /*
         viewModel.savePreferences(
+            getMeasurementValue()
+
+            /*
             binding.switch6.isChecked,
             binding.header.text.toString(),
             binding.switch1.isChecked,
@@ -201,11 +171,10 @@ class SettingsFragment : Fragment() {
             operationDelayValue = binding.operationDelay.text.toString().toIntOrNull()
                 ?: 0,
             binding.switch7.isChecked,
-            intervalCreateRecords = binding.intervalCreate.text.toString().toIntOrNull() ?: 0
+            intervalCreateRecords = binding.intervalCreate.text.toString().toIntOrNull() ?:
+             */
         )
         definitionOfChange()
-
-         */
     }
 
     override fun onStop() {
@@ -216,7 +185,7 @@ class SettingsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        //definitionOfChange()
+        definitionOfChange()
     }
 
     override fun onDestroyView() {

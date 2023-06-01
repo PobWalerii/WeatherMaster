@@ -27,17 +27,18 @@ class SettingsViewModel @Inject constructor(
 
  */
 
+    var measurement: StateFlow<String> = appSettings.measurement
+
     var isLoadedPreferences: StateFlow<Boolean> = appSettings.isLoadedPreferences
 
     //init {
     //    appSettings.showViewForSnack = null
     //}
 
-    //fun setDefaultPreferences() {
-    //    appSettings.setDefaultPreferences()
-    //}
 
     fun savePreferences(
+        measurement: String,
+
         /*
         firstRun: Boolean,
         defaultHeader: String,
@@ -52,11 +53,11 @@ class SettingsViewModel @Inject constructor(
         operationDelayValue: Int,
         createBackgroundRecords: Boolean,
         intervalCreateRecords: Int
-
          */
     ) {
-        /*
         appSettings.savePreferences(
+            measurement
+            /*
             firstRun,
             defaultHeader,
             specificationLine,
@@ -70,12 +71,13 @@ class SettingsViewModel @Inject constructor(
             operationDelayValue,
             createBackgroundRecords,
             intervalCreateRecords
+             */
         )
-
-         */
     }
 
     fun isChange(
+        _measurement: String,
+
         /*
         _firstRun: Boolean,
         _defaultHeader: String,
@@ -93,7 +95,7 @@ class SettingsViewModel @Inject constructor(
 
          */
     ): Boolean {
-        return false
+        return measurement.value != _measurement
         /*
         return  firstRun.value != _firstRun ||
                 defaultHeader.value != _defaultHeader ||
@@ -108,7 +110,6 @@ class SettingsViewModel @Inject constructor(
                 operationDelayValue.value.toString() != _operationDelayValue ||
                 createBackgroundRecords.value != _createBackgroundRecords ||
                 intervalCreateRecords.value.toString() != _intervalCreateRecords
-
          */
     }
 }

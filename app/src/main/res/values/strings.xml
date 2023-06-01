@@ -5,6 +5,7 @@
     <string name="temperature_Fahrenheit">temperature in Fahrenheit</string>
     <string name="temperature_Celsius">temperature in Celsius</string>
     <string name="temperature_Kelvin">temperature in Kelvin</string>
+    <string name="settings_is_saved">Settings Saved</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

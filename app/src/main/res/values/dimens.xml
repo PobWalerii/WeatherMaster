@@ -6,4 +6,5 @@
     <dimen name="margin_settings_vertical">10dp</dimen>
     <dimen name="settings_text_size">20sp</dimen>
     <dimen name="settings_comment_size">15sp</dimen>
+    <dimen name="margin_comment_top">-10dp</dimen>
 </resources>
