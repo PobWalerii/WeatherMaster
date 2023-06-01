@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.weathermaster.R
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT1
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +15,8 @@ class AppSettings(
     private val applicationContext: Context
 ) {
 
-    private val _measurement = MutableStateFlow(MEASUREMENT1)
-    val measurement: StateFlow<String> = _measurement.asStateFlow()
+    private val _measurement = MutableStateFlow(1)
+    val measurement: StateFlow<Int> = _measurement.asStateFlow()
 
 
     //private val _firstLoad = MutableStateFlow(true)
@@ -128,7 +127,7 @@ class AppSettings(
     private fun getPreferences() {
         _isLoadedPreferences.value = false
 
-        _measurement.value = sPref.getString("measurement", MEASUREMENT1).toString()
+        _measurement.value = sPref.getInt("measurement", 1)
 
         //_firstRun.value = sPref.getBoolean("firstRun", SING_OF_FIRST_RUN)
         //_defaultHeader.value = sPref.getString("defaultHeader", DEFAULT_HEADER).toString()
@@ -152,7 +151,7 @@ class AppSettings(
     }
 
     fun savePreferences(
-        measurement: String,
+        measurement: Int,
 
         //firstRun: Boolean,
         //defaultHeader: String,
@@ -170,8 +169,7 @@ class AppSettings(
         //getDefault: Boolean = false
     ) {
         val ed: SharedPreferences.Editor = sPref.edit()
-        ed.putString("measurement", measurement)
-
+        ed.putInt("measurement", measurement)
         //ed.putBoolean("firstRun", firstRun)
         //ed.putString("defaultHeader", defaultHeader.ifEmpty { DEFAULT_HEADER })
         //ed.putBoolean("specificationLine", specificationLine)

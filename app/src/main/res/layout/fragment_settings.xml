@@ -8,8 +8,14 @@
         <import type="android.view.View" />
 
         <variable
-            name="measurement"
-            type="String" />
+            name="measurement1"
+            type="Boolean" />
+        <variable
+            name="measurement2"
+            type="Boolean" />
+        <variable
+            name="measurement3"
+            type="Boolean" />
         <variable
             name="isEdited"
             type="Boolean" />
@@ -88,7 +94,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement.toString() == KeyConstants.MEASUREMENT1 || measurement == null}"
+                android:checked="@{measurement1}"
                 android:text="@string/temperature_Fahrenheit"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />
@@ -106,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement == KeyConstants.MEASUREMENT2}"
+                android:checked="@{measurement2}"
                 android:text="@string/temperature_Celsius"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />
@@ -124,7 +130,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement.toString() == KeyConstants.MEASUREMENT3}"
+                android:checked="@{measurement3}"
                 android:text="@string/temperature_Kelvin"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />

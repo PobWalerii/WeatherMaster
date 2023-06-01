@@ -67,8 +67,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showSettings() {
-        Toast.makeText(context,"${viewModel.measurement.value}",Toast.LENGTH_LONG).show()
-        binding.measurement = viewModel.measurement.value
+        binding.measurement1 = viewModel.measurement.value == 1
+        binding.measurement2 = viewModel.measurement.value == 2
+        binding.measurement3 = viewModel.measurement.value == 3
+
         /*
         binding.firstRun = viewModel.firstRun.value
         binding.defaultHeader = viewModel.defaultHeader.value
@@ -89,44 +91,61 @@ class SettingsFragment : Fragment() {
 
 
     private fun setListenersSettingsChanged() {
+
+        /*
         binding.switch1.setOnClickListener {
-            binding.measurement = MEASUREMENT1
+            binding.measurement = 1
             definitionOfChange()
         }
         binding.switch2.setOnClickListener {
-            binding.measurement = MEASUREMENT2
+            binding.measurement = 2
             definitionOfChange()
         }
         binding.switch3.setOnClickListener {
-            binding.measurement = MEASUREMENT3
+            binding.measurement = 3
             definitionOfChange()
         }
 
- /*
+         */
+
 
         val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             if(buttonView == binding.switch1 || buttonView == binding.switch2 || buttonView == binding.switch3) {
-                binding.measurement = when(buttonView) {
-                    binding.switch2 -> MEASUREMENT2
-                    binding.switch3 -> MEASUREMENT3
-                    else -> MEASUREMENT1
+                if (buttonView == binding.switch2) {
+                    if (isChecked) {
+                        binding.measurement1 = false
+                        binding.measurement2 = true
+                        binding.measurement3 = false
+                    } else binding.measurement1 = true
+                } else if (buttonView == binding.switch3) {
+                    if (isChecked) {
+                        binding.measurement1 = false
+                        binding.measurement2 = false
+                        binding.measurement3 = true
+                    } else binding.measurement1 = true
+                } else {
+                    if (isChecked) {
+                        binding.measurement1 = true
+                        binding.measurement2 = false
+                        binding.measurement3 = false
+                    } else binding.measurement2 = true
                 }
             }
-            //definitionOfChange()
+            definitionOfChange()
         }
         binding.switch1.setOnCheckedChangeListener(changeListener)
         binding.switch2.setOnCheckedChangeListener(changeListener)
         binding.switch3.setOnCheckedChangeListener(changeListener)
-
-  */
     }
 
     internal fun definitionOfChange() {
         binding.isEdited = getIsChange()
     }
 
-    private fun getIsChange(): Boolean =
-        viewModel.isChange(
+    private fun getIsChange(): Boolean {
+        val change = getMeasurementValue()
+        Toast.makeText(context,"$change",Toast.LENGTH_SHORT).show()
+        return viewModel.isChange(
             getMeasurementValue()
 
             /*
@@ -144,12 +163,12 @@ class SettingsFragment : Fragment() {
             binding.switch7.isChecked,
             binding.intervalCreate.text.toString()
              */
-        )
+        )}
 
-    private fun getMeasurementValue(): String = when {
-        binding.switch2.isChecked -> MEASUREMENT2
-        binding.switch3.isChecked -> MEASUREMENT3
-        else -> MEASUREMENT1
+    private fun getMeasurementValue(): Int = when {
+        binding.switch2.isChecked -> 2
+        binding.switch3.isChecked -> 3
+        else -> 1
     }
 
     private fun saveSettings() {

@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(
 
  */
 
-    var measurement: StateFlow<String> = appSettings.measurement
+    var measurement: StateFlow<Int> = appSettings.measurement
 
     var isLoadedPreferences: StateFlow<Boolean> = appSettings.isLoadedPreferences
 
@@ -37,7 +37,7 @@ class SettingsViewModel @Inject constructor(
 
 
     fun savePreferences(
-        measurement: String,
+        measurement: Int,
 
         /*
         firstRun: Boolean,
@@ -76,7 +76,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun isChange(
-        _measurement: String,
+        _measurement: Int,
 
         /*
         _firstRun: Boolean,
