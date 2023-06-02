@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -8,20 +9,14 @@
         <import type="android.view.View" />
 
         <variable
-            name="measurement1"
-            type="Boolean" />
-        <variable
-            name="measurement2"
-            type="Boolean" />
-        <variable
-            name="measurement3"
-            type="Boolean" />
+            name="measurement"
+            type="Integer" />
         <variable
             name="isEdited"
             type="Boolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradient"
@@ -41,8 +36,8 @@
 
         <ImageView
             android:id="@+id/arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
             android:layout_marginStart="@dimen/margin_image_horisontal"
             android:src="@drawable/arrow_back"
             app:layout_constraintBottom_toBottomOf="@+id/title"
@@ -52,8 +47,9 @@
 
         <ImageView
             android:id="@+id/save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:padding="@dimen/button_padding"
             android:layout_marginEnd="@dimen/margin_image_horisontal"
             android:src="@drawable/save"
             app:visibility="@{isEdited ? View.VISIBLE : View.INVISIBLE}"
@@ -94,7 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement1}"
+                android:checked="@{measurement == 1}"
                 android:text="@string/temperature_Fahrenheit"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />
@@ -112,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement2}"
+                android:checked="@{measurement == 2}"
                 android:text="@string/temperature_Celsius"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />
@@ -130,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_comment_top"
-                android:checked="@{measurement3}"
+                android:checked="@{measurement == 3}"
                 android:text="@string/temperature_Kelvin"
                 android:textColor="@color/white"
                 android:textSize="@dimen/settings_comment_size" />
@@ -142,6 +138,10 @@
                 android:background="@color/white" />
 
         </LinearLayout>
+
+
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

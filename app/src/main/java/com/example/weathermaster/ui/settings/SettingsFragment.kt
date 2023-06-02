@@ -61,9 +61,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showSettings() {
-        binding.measurement1 = viewModel.measurement.value == 1
-        binding.measurement2 = viewModel.measurement.value == 2
-        binding.measurement3 = viewModel.measurement.value == 3
+        binding.measurement = viewModel.measurement.value
+
 
         /*
         binding.firstRun = viewModel.firstRun.value
@@ -85,6 +84,40 @@ class SettingsFragment : Fragment() {
 
 
     private fun setListenersSettingsChanged() {
+
+        binding.switch1.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                binding.switch2.isChecked = false
+                binding.switch3.isChecked = false
+                binding.measurement = 1
+                definitionOfChange()
+            }
+        }
+
+        binding.switch2.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                binding.switch1.isChecked = false
+                binding.switch3.isChecked = false
+                binding.measurement = 2
+                definitionOfChange()
+            }
+        }
+
+        binding.switch3.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                binding.switch1.isChecked = false
+                binding.switch2.isChecked = false
+                binding.measurement = 3
+                definitionOfChange()
+            }
+        }
+
+
+
+
+
+
+        /*
         val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             //binding.measurement1 = buttonView == binding.switch1
             //binding.measurement2 = buttonView == binding.switch2
@@ -94,6 +127,8 @@ class SettingsFragment : Fragment() {
         binding.switch1.setOnCheckedChangeListener(changeListener)
         binding.switch2.setOnCheckedChangeListener(changeListener)
         binding.switch3.setOnCheckedChangeListener(changeListener)
+
+         */
     }
 
     private fun definitionOfChange() {
