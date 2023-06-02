@@ -86,9 +86,9 @@ class SettingsFragment : Fragment() {
 
     private fun setListenersSettingsChanged() {
         val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            binding.measurement1 = buttonView == binding.switch1
-            binding.measurement2 = buttonView == binding.switch2
-            binding.measurement3 = buttonView == binding.switch3
+            //binding.measurement1 = buttonView == binding.switch1
+            //binding.measurement2 = buttonView == binding.switch2
+            //binding.measurement3 = buttonView == binding.switch3
             definitionOfChange()
         }
         binding.switch1.setOnCheckedChangeListener(changeListener)
