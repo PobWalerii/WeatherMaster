@@ -6,18 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.weathermaster.databinding.FragmentSettingsBinding
 import com.example.weathermaster.ui.main.MainActivity
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT1
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT2
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT3
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @AndroidEntryPoint
@@ -91,46 +85,10 @@ class SettingsFragment : Fragment() {
 
 
     private fun setListenersSettingsChanged() {
-
-        /*
-        binding.switch1.setOnClickListener {
-            binding.measurement = 1
-            definitionOfChange()
-        }
-        binding.switch2.setOnClickListener {
-            binding.measurement = 2
-            definitionOfChange()
-        }
-        binding.switch3.setOnClickListener {
-            binding.measurement = 3
-            definitionOfChange()
-        }
-
-         */
-
-
         val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            if(buttonView == binding.switch1 || buttonView == binding.switch2 || buttonView == binding.switch3) {
-                if (buttonView == binding.switch2) {
-                    if (isChecked) {
-                        binding.measurement1 = false
-                        binding.measurement2 = true
-                        binding.measurement3 = false
-                    } else binding.measurement1 = true
-                } else if (buttonView == binding.switch3) {
-                    if (isChecked) {
-                        binding.measurement1 = false
-                        binding.measurement2 = false
-                        binding.measurement3 = true
-                    } else binding.measurement1 = true
-                } else {
-                    if (isChecked) {
-                        binding.measurement1 = true
-                        binding.measurement2 = false
-                        binding.measurement3 = false
-                    } else binding.measurement2 = true
-                }
-            }
+            binding.measurement1 = buttonView == binding.switch1
+            binding.measurement2 = buttonView == binding.switch2
+            binding.measurement3 = buttonView == binding.switch3
             definitionOfChange()
         }
         binding.switch1.setOnCheckedChangeListener(changeListener)
@@ -138,13 +96,11 @@ class SettingsFragment : Fragment() {
         binding.switch3.setOnCheckedChangeListener(changeListener)
     }
 
-    internal fun definitionOfChange() {
+    private fun definitionOfChange() {
         binding.isEdited = getIsChange()
     }
 
     private fun getIsChange(): Boolean {
-        val change = getMeasurementValue()
-        Toast.makeText(context,"$change",Toast.LENGTH_SHORT).show()
         return viewModel.isChange(
             getMeasurementValue()
 
@@ -165,11 +121,13 @@ class SettingsFragment : Fragment() {
              */
         )}
 
-    private fun getMeasurementValue(): Int = when {
-        binding.switch2.isChecked -> 2
-        binding.switch3.isChecked -> 3
-        else -> 1
-    }
+    private fun getMeasurementValue(): Int =
+        if(binding.switch1.isChecked) 1
+        else if(binding.switch2.isChecked) 2
+        else 3
+
+
+
 
     private fun saveSettings() {
         viewModel.savePreferences(
@@ -195,12 +153,6 @@ class SettingsFragment : Fragment() {
         )
         definitionOfChange()
     }
-
-    override fun onStop() {
-        super.onStop()
-        //hideKeyboardFromView(requireContext(),requireView())
-    }
-
 
     override fun onResume() {
         super.onResume()
