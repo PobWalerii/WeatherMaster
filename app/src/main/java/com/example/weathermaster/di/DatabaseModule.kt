@@ -38,11 +38,13 @@ object DatabaseModule {
     @Provides
     fun provideRepository(
         weatherDao: WeatherDao,
-        apiService: ApiService,
+        //apiService: ApiService,
         locationManager: LocationManager,
         @ApplicationContext applicationContext: Context,
     ): Repository {
-        return Repository(weatherDao, apiService, locationManager, applicationContext)
+        return Repository(weatherDao,
+            //apiService,
+            locationManager, applicationContext)
     }
 
 }

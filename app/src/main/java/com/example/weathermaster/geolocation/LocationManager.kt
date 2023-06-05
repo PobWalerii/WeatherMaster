@@ -1,13 +1,16 @@
 package com.example.weathermaster.geolocation
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Looper
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
-import com.example.weathermaster.Manifest
+import com.example.weathermaster.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -24,48 +27,40 @@ class LocationManager @Inject constructor(
     private var locationRequest= LocationRequest()
     private var startedLocationTracking = false
 
-    private val LOCATION_PERMISSION_CODE = 1000
-
     init {
         configureLocationRequest()
         setupLocationProviderClient()
     }
 
-
-
-
-
     @SuppressLint("ObsoleteSdkInt")
-    fun requestLocationPermission(): Boolean {
+    fun requestLocationPermission(activity: Activity): Boolean {
         var permissionGranted = false
-// If system os is Marshmallow or Above, we need to request runtime permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-
             val coarseLocationPermission = android.Manifest.permission.ACCESS_COARSE_LOCATION
             val coarseLocationPermissionGranted = ContextCompat.checkSelfPermission(
                 context, coarseLocationPermission
             ) == PackageManager.PERMISSION_GRANTED
 
-
-            val cameraPermissionNotGranted = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_DENIED
-            if (cameraPermissionNotGranted){
-                val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                // Display permission dialog
-                requestPermissions(permission, LOCATION_PERMISSION_CODE)
+            if (!coarseLocationPermissionGranted){
+                val permission = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                requestPermissions(activity, permission, REQUEST_LOCATION_PERMISSION)
             }
             else{
-                // Permission already granted
                 permissionGranted = true
             }
         }
         else{
-            // Android version earlier than M -> no need to request permission
             permissionGranted = true
         }
         return permissionGranted
+    }
+
+    fun showAlert(message: String) {
+        val builder = AlertDialog.Builder(context)
+        builder.setMessage(message)
+        builder.setPositiveButton(R.string.ok_button_title, null)
+        val dialog = builder.create()
+        dialog.show()
     }
 
 
@@ -102,5 +97,6 @@ class LocationManager @Inject constructor(
     companion object {
         const val UPDATE_INTERVAL_MILLISECONDS: Long = 0
         const val FASTEST_UPDATE_INTERVAL_MILLISECONDS = UPDATE_INTERVAL_MILLISECONDS / 2
+        private const val REQUEST_LOCATION_PERMISSION = 1000
     }
 }

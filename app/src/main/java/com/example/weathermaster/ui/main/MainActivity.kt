@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.findNavController
 import com.example.weathermaster.R
+import com.example.weathermaster.data.repository.Repository
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.SplashScreen.startSplash
 import dagger.hilt.android.AndroidEntryPoint
@@ -14,10 +15,13 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var appSettings: AppSettings
+    @Inject
+    lateinit var repository: Repository
     override fun onCreate(savedInstanceState: Bundle?) {
         startSplash(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        repository.init(this)
         appSettings.init()
     }
 
