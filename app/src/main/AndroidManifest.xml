@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:androidx.activity="http://schemas.android.com/apk/res-auto">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".WeatherApplication"
         android:allowBackup="true"

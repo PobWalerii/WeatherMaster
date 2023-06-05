@@ -84,51 +84,20 @@ class SettingsFragment : Fragment() {
 
 
     private fun setListenersSettingsChanged() {
-
-        binding.switch1.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                binding.switch2.isChecked = false
-                binding.switch3.isChecked = false
-                binding.measurement = 1
-                definitionOfChange()
+        val switches = listOf(binding.switch1, binding.switch2, binding.switch3)
+        switches.forEachIndexed { index, switch ->
+            switch.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    switches.forEachIndexed { innerIndex, innerSwitch ->
+                        if (innerIndex != index) {
+                            innerSwitch.isChecked = false
+                        }
+                    }
+                    binding.measurement = index + 1
+                    definitionOfChange()
+                }
             }
         }
-
-        binding.switch2.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                binding.switch1.isChecked = false
-                binding.switch3.isChecked = false
-                binding.measurement = 2
-                definitionOfChange()
-            }
-        }
-
-        binding.switch3.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                binding.switch1.isChecked = false
-                binding.switch2.isChecked = false
-                binding.measurement = 3
-                definitionOfChange()
-            }
-        }
-
-
-
-
-
-
-        /*
-        val changeListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            //binding.measurement1 = buttonView == binding.switch1
-            //binding.measurement2 = buttonView == binding.switch2
-            //binding.measurement3 = buttonView == binding.switch3
-            definitionOfChange()
-        }
-        binding.switch1.setOnCheckedChangeListener(changeListener)
-        binding.switch2.setOnCheckedChangeListener(changeListener)
-        binding.switch3.setOnCheckedChangeListener(changeListener)
-
-         */
     }
 
     private fun definitionOfChange() {

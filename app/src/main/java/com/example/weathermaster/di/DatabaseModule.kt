@@ -6,6 +6,7 @@ import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.database.base.AppDatabase
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.repository.Repository
+import com.example.weathermaster.geolocation.LocationManager
 import com.example.weathermaster.utils.KeyConstants
 import dagger.Module
 import dagger.Provides
@@ -38,9 +39,10 @@ object DatabaseModule {
     fun provideRepository(
         weatherDao: WeatherDao,
         apiService: ApiService,
+        locationManager: LocationManager,
         @ApplicationContext applicationContext: Context,
     ): Repository {
-        return Repository(weatherDao, apiService, applicationContext)
+        return Repository(weatherDao, apiService, locationManager, applicationContext)
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.weathermaster.data.repository
 import android.content.Context
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.database.dao.WeatherDao
+import com.example.weathermaster.geolocation.LocationManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,8 +11,15 @@ import javax.inject.Singleton
 class Repository @Inject constructor(
     private val weatherDao: WeatherDao,
     private val apiService: ApiService,
+    private val locationManager: LocationManager,
     private val applicationContext: Context,
 ) {
+    init {
+        val permissionGranted = locationManager.requestLocationPermission()
+        if (permissionGranted) {
+            locationManager.startLocationTracking(locationCallback)
+            locationTrackingRequested = true
+        }
 
 
 
