@@ -28,6 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".geolocation.LocationService"
+            android:foregroundServiceType="location"
+            android:permission="android.permission.ACCESS_FINE_LOCATION"/>
+
     </application>
 
 </manifest>

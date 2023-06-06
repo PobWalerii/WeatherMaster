@@ -8,7 +8,7 @@
     <string name="temperature_Kelvin">temperature in Kelvin</string>
     <string name="settings_is_saved">Settings Saved</string>
 
-    <string name="ok_button_title">OK</string>
+    <string name="permission">To ensure proper app functionality, permission to access location is required.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

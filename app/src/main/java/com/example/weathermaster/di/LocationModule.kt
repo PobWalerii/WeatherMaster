@@ -1,10 +1,9 @@
 package com.example.weathermaster.di
 
 import android.content.Context
-import com.example.weathermaster.data.apiservice.ApiService
-import com.example.weathermaster.data.database.dao.WeatherDao
-import com.example.weathermaster.data.repository.Repository
 import com.example.weathermaster.geolocation.LocationManager
+import com.example.weathermaster.geolocation.LocationService
+import com.example.weathermaster.settings.AppSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,9 +18,20 @@ object LocationModule {
     @Singleton
     @Provides
     fun provideLocationManager(
+        locationService: LocationService,
         @ApplicationContext applicationContext: Context,
     ): LocationManager {
-        return LocationManager(applicationContext)
+        return LocationManager(locationService, applicationContext)
     }
+
+    @Singleton
+    @Provides
+    fun provideLocationService(
+        appSettings: AppSettings,
+        @ApplicationContext applicationContext: Context,
+    ): LocationService {
+        return LocationService(appSettings, applicationContext)
+    }
+
 
 }
