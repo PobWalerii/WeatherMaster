@@ -29,7 +29,6 @@ class Repository @Inject constructor(
             }
         }
     }
-
     private fun showLocation(latitude: String,longitude:String) {
         Toast.makeText(applicationContext,"$latitude, $longitude",Toast.LENGTH_SHORT).show()
     }
@@ -37,9 +36,9 @@ class Repository @Inject constructor(
     fun init(activity: Activity) {
         val permissionGranted = locationManager.requestLocationPermission(activity)
         if (permissionGranted) {
-            Toast.makeText(applicationContext,"Yes Permishen",Toast.LENGTH_SHORT).show()
             locationManager.startLocationTracking(locationCallback)
         } else {
+            locationManager.stopLocationTracking()
             locationManager.showAlert("Location permission was denied. Unable to track location.")
         }
     }
