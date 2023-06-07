@@ -18,12 +18,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var appSettings: AppSettings
     @Inject
     lateinit var locationManager: LocationManager
+    @Inject
+    lateinit var repository: Repository
     override fun onCreate(savedInstanceState: Bundle?) {
         startSplash(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         appSettings.init()
         locationManager.init(this)
+        repository.init()
     }
 
     override fun onSupportNavigateUp(): Boolean {

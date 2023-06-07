@@ -19,18 +19,15 @@ class AppSettings(
     private val _measurement = MutableStateFlow(1)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
 
-    private val _latitude = MutableStateFlow("")
-    val latitude: StateFlow<String> = _latitude.asStateFlow()
+    private val _latitude = MutableStateFlow(0.0)
+    val latitude: StateFlow<Double> = _latitude.asStateFlow()
 
-    private val _longitude = MutableStateFlow("")
-    val longitude: StateFlow<String> = _longitude.asStateFlow()
+    private val _longitude = MutableStateFlow(0.0)
+    val longitude: StateFlow<Double> = _longitude.asStateFlow()
 
-    fun setLocation(latitude: String, longitude:String) {
+    fun setLocation(latitude: Double, longitude:Double) {
         _latitude.value = latitude
         _longitude.value = longitude
-        val currentLocale: Locale = applicationContext.resources.configuration.locales.get(0)
-        val languageCode: String = currentLocale.language
-        Toast.makeText(applicationContext,"$latitude,$longitude,$languageCode",Toast.LENGTH_LONG).show()
     }
 
 

@@ -31,7 +31,7 @@ class LocationService(): Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult ?: return
             for (location in locationResult.locations){
-                appSettings.setLocation(location.latitude.toString(), location.longitude.toString())
+                appSettings.setLocation(location.latitude, location.longitude)
             }
         }
     }
