@@ -3,13 +3,8 @@ package com.example.weathermaster.data.repository
 import android.app.Activity
 import android.content.Context
 
-import android.widget.Toast
-import com.example.weathermaster.R
-import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.geolocation.LocationManager
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
 import javax.inject.Inject
 import javax.inject.Singleton
 

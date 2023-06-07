@@ -52,17 +52,12 @@ class LocationManager @Inject constructor(
         var permissionGranted = false
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            val coarseLocationPermission =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                } else {
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                }
+            val coarseLocationPermission = android.Manifest.permission.ACCESS_COARSE_LOCATION
             val coarseLocationPermissionGranted = ContextCompat.checkSelfPermission(
                 context, coarseLocationPermission
             ) == PackageManager.PERMISSION_GRANTED
             if (!coarseLocationPermissionGranted){
-                val permission = arrayOf(coarseLocationPermission)
+                val permission = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 val permissionRequested =
                     ActivityCompat.shouldShowRequestPermissionRationale(activity, permission[0])
                 if (permissionRequested) {

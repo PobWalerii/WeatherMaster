@@ -8,6 +8,7 @@ import com.example.weathermaster.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.*
 import javax.inject.Singleton
 
 @Singleton
@@ -17,6 +18,20 @@ class AppSettings(
 
     private val _measurement = MutableStateFlow(1)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
+
+    private val _latitude = MutableStateFlow("")
+    val latitude: StateFlow<String> = _latitude.asStateFlow()
+
+    private val _longitude = MutableStateFlow("")
+    val longitude: StateFlow<String> = _longitude.asStateFlow()
+
+    fun setLocation(latitude: String, longitude:String) {
+        _latitude.value = latitude
+        _longitude.value = longitude
+        val currentLocale: Locale = applicationContext.resources.configuration.locales.get(0)
+        val languageCode: String = currentLocale.language
+        Toast.makeText(applicationContext,"$latitude,$longitude,$languageCode",Toast.LENGTH_LONG).show()
+    }
 
 
     //private val _firstLoad = MutableStateFlow(true)
