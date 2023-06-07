@@ -19,6 +19,8 @@ import com.example.weathermaster.R
 class LocationManager_ @Inject constructor(
     private val context: Context
 ) {
+
+    /*
     private lateinit var locationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -92,4 +94,6 @@ class LocationManager_ @Inject constructor(
     companion object {
         private const val REQUEST_LOCATION_PERMISSION = 1000
     }
+
+     */
 }

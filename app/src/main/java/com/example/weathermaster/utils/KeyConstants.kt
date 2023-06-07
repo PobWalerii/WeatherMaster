@@ -1,5 +1,7 @@
 package com.example.weathermaster.utils
 
+import com.example.weathermaster.R
+
 object KeyConstants {
     const val DATABASE_NAME = "data-weather"
     const val BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
@@ -9,4 +11,6 @@ object KeyConstants {
     const val MEASUREMENT1 = "standard"
     const val MEASUREMENT2 = "metric"
     const val MEASUREMENT3 = "imperial"
+    const val CHANNEL_ID = R.string.app_name
+    const val NOTIFICATION_ID = 1234512345
 }
