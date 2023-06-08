@@ -84,44 +84,7 @@ dependencies {
 
     // geo location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.21"
 
 
 }

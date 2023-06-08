@@ -1,4 +1,4 @@
-package com.example.weathermaster.data.apiservice.location
+package com.example.weathermaster.data.apiservice.response
 
 class Location : ArrayList<LocationItem>()
 

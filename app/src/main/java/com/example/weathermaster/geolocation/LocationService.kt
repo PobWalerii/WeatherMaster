@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.widget.Toast
 import com.example.weathermaster.geolocation.ServiceNotification.setNotification
+import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.NOTIFICATION_ID
 import com.google.android.gms.location.*
@@ -20,6 +21,8 @@ class LocationService(): Service() {
 
     @Inject
     lateinit var appSettings: AppSettings
+    @Inject
+    lateinit var notificationManager: NotificationManager
 
     private lateinit var locationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
@@ -38,7 +41,8 @@ class LocationService(): Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val notification = setNotification(applicationContext)
+        val notification = notificationManager.setNotification()
+            //setNotification(applicationContext)
         startForeground(NOTIFICATION_ID, notification)
 
         createLocationRequest()
