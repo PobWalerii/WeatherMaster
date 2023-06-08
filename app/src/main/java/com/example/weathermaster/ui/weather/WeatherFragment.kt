@@ -37,6 +37,7 @@ class WeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeCityName()
+        observeCurrentTemp()
         setupSettingsClickListener()
     }
 
@@ -44,6 +45,14 @@ class WeatherFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.myCity.collect {
                 binding.city = if(it.isEmpty()) getString(R.string.my_city) else it
+            }
+        }
+    }
+
+    private fun observeCurrentTemp() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.currentTemp.collect {
+                binding.currentTemp = it
             }
         }
     }

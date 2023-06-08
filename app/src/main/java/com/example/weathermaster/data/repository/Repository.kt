@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.roundToInt
 
 @Singleton
 class Repository @Inject constructor(
@@ -34,6 +35,9 @@ class Repository @Inject constructor(
 
     private val _myCity = MutableStateFlow("")
     val myCity: StateFlow<String> = _myCity.asStateFlow()
+
+    private val _currentTemp = MutableStateFlow(0)
+    val currentTemp: StateFlow<Int> = _currentTemp.asStateFlow()
 
     fun init() {
         observeLocation()
@@ -66,10 +70,7 @@ class Repository @Inject constructor(
                 languageCode,
                 API_KEY
             )
-
-
-
-
+            _currentTemp.value = response.main.temp.roundToInt()
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()

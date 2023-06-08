@@ -10,6 +10,9 @@
         <variable
             name="city"
             type="String" />
+        <variable
+            name="currentTemp"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +32,18 @@
             app:layout_constraintEnd_toStartOf="@+id/settings"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tempCurrent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/current_temp_margin_top"
+            android:text="@{currentTemp.toString()}"
+            android:textColor="@color/white"
+            android:textSize="@dimen/current_temp_size"
+            app:layout_constraintEnd_toEndOf="@id/title"
+            app:layout_constraintStart_toStartOf="@id/title"
+            app:layout_constraintTop_toTopOf="@id/title" />
 
         <ImageView
             android:id="@+id/settings"

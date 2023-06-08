@@ -9,4 +9,7 @@
     <dimen name="margin_comment_top">-10dp</dimen>
     <dimen name="button_size">30dp</dimen>
     <dimen name="button_padding">2dp</dimen>
+
+    <dimen name="current_temp_size">150sp</dimen>
+    <dimen name="current_temp_margin_top">50dp</dimen>
 </resources>

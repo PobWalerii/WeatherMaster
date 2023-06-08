@@ -12,7 +12,7 @@ class WeatherViewModel @Inject constructor(
 ): ViewModel() {
 
     val myCity: StateFlow<String> = repository.myCity
-
+    val currentTemp: StateFlow<Int> = repository.currentTemp
 
 
 }
