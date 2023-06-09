@@ -25,11 +25,24 @@ class AppSettings(
     private val _longitude = MutableStateFlow(0.0)
     val longitude: StateFlow<Double> = _longitude.asStateFlow()
 
+    private val _currentRefresh = MutableStateFlow(false)
+    val currentRefresh: StateFlow<Boolean> = _currentRefresh.asStateFlow()
+
+    private val _checkCity = MutableStateFlow(false)
+    val checkCity: StateFlow<Boolean> = _checkCity.asStateFlow()
+
     fun setLocation(latitude: Double, longitude:Double) {
         _latitude.value = latitude
         _longitude.value = longitude
+        _checkCity.value = true
+        _currentRefresh.value = true
     }
-
+    fun setCurrentRefresh() {
+        _currentRefresh.value = false
+    }
+    fun setCheckCity() {
+        _checkCity.value = false
+    }
 
     //private val _firstLoad = MutableStateFlow(true)
     //val firstLoad: StateFlow<Boolean> = _firstLoad.asStateFlow()

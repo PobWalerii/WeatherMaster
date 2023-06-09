@@ -43,6 +43,8 @@ class Repository @Inject constructor(
 
     private val latitude: StateFlow<Double> = appSettings.latitude
     private val longitude: StateFlow<Double> = appSettings.longitude
+    private val currentRefresh: StateFlow<Boolean> = appSettings.currentRefresh
+    private val checkCity: StateFlow<Boolean> = appSettings.checkCity
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
     private val measurement: StateFlow<Int> = appSettings.measurement
 
@@ -64,9 +66,30 @@ class Repository @Inject constructor(
 
 
     fun init() {
+        observeCheckCity()
+        observeCurrent()
         observeMeasurement()
-        observeLocation()
-        observeCityName()
+    }
+
+    private fun observeCheckCity() {
+        CoroutineScope(Dispatchers.Default).launch {
+            checkCity.collect {
+                if(it) {
+                    getSity()
+                }
+            }
+        }
+    }
+
+    private fun observeCurrent() {
+        CoroutineScope(Dispatchers.Default).launch {
+            combine(checkCity,currentRefresh) {checkCity,currentRefresh -> Pair(checkCity,currentRefresh)}
+            .collect {(checkCity,currentRefresh) ->
+                if(!checkCity && currentRefresh) {
+                    getWeather()
+                }
+            }
+        }
     }
 
     private fun observeMeasurement() {
@@ -75,19 +98,6 @@ class Repository @Inject constructor(
                 _tempSimbol.value = listOf("K","\u2103","\u2109")[it-1]
                 _speedSimbol.value = listOf("m/s","m/s","mph")[it-1]
                 getWeather()
-            }
-        }
-    }
-
-    private fun observeLocation() {
-        CoroutineScope(Dispatchers.Default).launch {
-            combine(
-                latitude,
-                longitude
-            ) { lat, lon -> Pair(lat, lon) }.collect { (lat, lon) ->
-                if(lat != 0.0 || lon != 0.0) {
-                    getSity(lat, lon)
-                }
             }
         }
     }
@@ -109,20 +119,25 @@ class Repository @Inject constructor(
             _description.value = response.weather[0].description.replaceFirstChar { it.uppercase() }
             _icon.value = response.weather[0].icon
             notificationManager.updateNotificationContent(
+                icon = icon.value,
                 title = myCity.value,
                 content = "${currentTemp.value}${tempSimbol.value}  ${description.value}"
             )
-
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
+        } finally {
+            appSettings.setCurrentRefresh()
         }
     }
 
-    private suspend fun getSity(lat: Double, lon: Double) {
+    private suspend fun getSity() {
         try {
-            val response = apiService.getCity(lat,lon,1, API_KEY)[0]
+            val response = apiService.getCity(
+                latitude.value,
+                longitude.value,
+                1, API_KEY)[0]
             val localNames = response.local_names
             val city: String? = localNames.javaClass.declaredFields
                 .firstOrNull { it.name == languageCode }
@@ -139,25 +154,8 @@ class Repository @Inject constructor(
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
+        } finally {
+            appSettings.setCheckCity()
         }
     }
-
-    private fun observeCityName() {
-        CoroutineScope(Dispatchers.Default).launch {
-            myCity.collect {
-                notificationManager.updateNotificationContent(title = it, "Ждем данные...")
-                getWeather()
-            }
-        }
-
-
-
-    }
-
-
-
-
-
-
-
 }

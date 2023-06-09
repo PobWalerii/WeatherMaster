@@ -52,11 +52,11 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
 
     //fragment
-    implementation "androidx.fragment:fragment-ktx:1.5.7"
+    implementation "androidx.fragment:fragment-ktx:1.6.0"
 
     //navigation
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
 
     //hilt
     implementation 'com.google.dagger:hilt-android:2.44'

@@ -5,8 +5,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.os.Looper
-import android.widget.Toast
-import com.example.weathermaster.geolocation.ServiceNotification.setNotification
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.NOTIFICATION_ID
@@ -27,8 +25,8 @@ class LocationService(): Service() {
     private lateinit var locationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private var startedLocationTracking = false
-    private var timeInterval: Long = 3600000
-    private var minimalDistance: Float = 1F
+    private var timeInterval: Long = 60000
+    private var minimalDistance: Float = 1000F
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -42,7 +40,6 @@ class LocationService(): Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val notification = notificationManager.setNotification()
-            //setNotification(applicationContext)
         startForeground(NOTIFICATION_ID, notification)
 
         createLocationRequest()
@@ -54,7 +51,6 @@ class LocationService(): Service() {
 
     override fun onCreate() {
         super.onCreate()
-
         //appSettings.setIsBackService(true)
     }
 
@@ -98,7 +94,7 @@ class LocationService(): Service() {
             LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, timeInterval).apply {
                 setMinUpdateDistanceMeters(minimalDistance)
                 setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
-                setWaitForAccurateLocation(true)
+                setWaitForAccurateLocation(false)
             }.build()
     }
 
