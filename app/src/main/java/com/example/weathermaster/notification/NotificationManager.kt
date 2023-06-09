@@ -41,8 +41,8 @@ class NotificationManager @Inject constructor(
     fun setNotification(): Notification {
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.small)
-            .setContentTitle("")
-            .setContentText("")
+            //.setContentTitle("")
+            //.setContentText("")
 
         val notification = notificationBuilder.build()
         return notification

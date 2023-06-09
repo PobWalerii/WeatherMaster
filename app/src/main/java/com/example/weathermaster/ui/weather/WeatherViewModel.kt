@@ -12,7 +12,12 @@ class WeatherViewModel @Inject constructor(
 ): ViewModel() {
 
     val myCity: StateFlow<String> = repository.myCity
-    val currentTemp: StateFlow<Int> = repository.currentTemp
+    val currentTemp: StateFlow<Double> = repository.currentTemp
+    val description: StateFlow<String> = repository.description
+    val icon: StateFlow<String> = repository.icon
 
-
+    val tempSimbol: StateFlow<String> = repository.tempSimbol
+    val pressureSimbol: StateFlow<String> = repository.pressureSimbol
+    val speedSimbol: StateFlow<String> = repository.speedSimbol
+    val humiditySimbol: StateFlow<String> = repository.humiditySimbol
 }

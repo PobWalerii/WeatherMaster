@@ -11,8 +11,17 @@
             name="city"
             type="String" />
         <variable
+            name="simbolTemp"
+            type="String" />
+        <variable
             name="currentTemp"
-            type="Integer" />
+            type="Double" />
+        <variable
+            name="description"
+            type="String" />
+        <variable
+            name="icon"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,17 +42,60 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+
+        <LinearLayout
             android:id="@+id/tempCurrent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/current_temp_margin_top"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{currentTemp.toString()}"
+                android:textColor="@color/white"
+                android:textSize="@dimen/current_temp_size" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{simbolTemp}"
+                android:textColor="@color/white"
+                android:textSize="@dimen/current_simbol_size"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/weather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/current_temp_margin_top"
-            android:text="@{currentTemp.toString()}"
+            android:text="@{description}"
             android:textColor="@color/white"
-            android:textSize="@dimen/current_temp_size"
-            app:layout_constraintEnd_toEndOf="@id/title"
-            app:layout_constraintStart_toStartOf="@id/title"
-            app:layout_constraintTop_toTopOf="@id/title" />
+            android:textSize="@dimen/current_info_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tempCurrent" />
+
+        <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="@dimen/current_ico_size"
+            android:layout_height="@dimen/current_ico_size"
+            app:showIcon="@{icon}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weather"
+            tools:ignore="ContentDescription" />
+
+
+
+
+
+
+
+
+
 
         <ImageView
             android:id="@+id/settings"

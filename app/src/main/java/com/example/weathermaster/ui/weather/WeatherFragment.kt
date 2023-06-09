@@ -53,6 +53,9 @@ class WeatherFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentTemp.collect {
                 binding.currentTemp = it
+                binding.simbolTemp = viewModel.tempSimbol.value
+                binding.description = viewModel.description.value
+                binding.icon = viewModel.icon.value
             }
         }
     }

@@ -10,6 +10,9 @@
     <dimen name="button_size">30dp</dimen>
     <dimen name="button_padding">2dp</dimen>
 
-    <dimen name="current_temp_size">150sp</dimen>
+    <dimen name="current_temp_size">100sp</dimen>
     <dimen name="current_temp_margin_top">50dp</dimen>
+    <dimen name="current_simbol_size">80sp</dimen>
+    <dimen name="current_info_size">18sp</dimen>
+    <dimen name="current_ico_size">100dp</dimen>
 </resources>
