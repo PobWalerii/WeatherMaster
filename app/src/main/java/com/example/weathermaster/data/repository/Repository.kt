@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.example.weathermaster.data.apiservice.ApiService
+import com.example.weathermaster.data.apiservice.response.Weather
+import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
@@ -34,11 +36,11 @@ class Repository @Inject constructor(
 
     private val _tempSimbol = MutableStateFlow("K")
     val tempSimbol: StateFlow<String> = _tempSimbol.asStateFlow()
-    private val _pressureSimbol = MutableStateFlow("hPa")
+    private val _pressureSimbol = MutableStateFlow(" hPa")
     val pressureSimbol: StateFlow<String> = _pressureSimbol.asStateFlow()
     private val _speedSimbol = MutableStateFlow("m/s")
     val speedSimbol: StateFlow<String> = _speedSimbol.asStateFlow()
-    private val _humiditySimbol = MutableStateFlow("%")
+    private val _humiditySimbol = MutableStateFlow(" %")
     val humiditySimbol: StateFlow<String> = _humiditySimbol.asStateFlow()
 
     private val latitude: StateFlow<Double> = appSettings.latitude
@@ -54,16 +56,8 @@ class Repository @Inject constructor(
     private val _myCity = MutableStateFlow("")
     val myCity: StateFlow<String> = _myCity.asStateFlow()
 
-    private val _currentTemp = MutableStateFlow(0.0)
-    val currentTemp: StateFlow<Double> = _currentTemp.asStateFlow()
-
-    private val _description = MutableStateFlow("")
-    val description: StateFlow<String> = _description.asStateFlow()
-
-    private val _icon = MutableStateFlow("")
-    val icon: StateFlow<String> = _icon.asStateFlow()
-
-
+    private val _currentWeather = MutableStateFlow<CurrentWeather?>(null)
+    val currentWeather: StateFlow<CurrentWeather?> = _currentWeather
 
     fun init() {
         observeCheckCity()
@@ -96,8 +90,10 @@ class Repository @Inject constructor(
         CoroutineScope(Dispatchers.Default).launch {
             measurement.collect {
                 _tempSimbol.value = listOf("K","\u2103","\u2109")[it-1]
-                _speedSimbol.value = listOf("m/s","m/s","mph")[it-1]
-                getWeather()
+                _speedSimbol.value = listOf(" m/s"," m/s"," mph")[it-1]
+                if(myCity.value.isNotEmpty()) {
+                    getWeather()
+                }
             }
         }
     }
@@ -115,14 +111,9 @@ class Repository @Inject constructor(
                 languageCode,
                 API_KEY
             )
-            _currentTemp.value = (response.main.temp * 10.0).roundToLong() /10.0
-            _description.value = response.weather[0].description.replaceFirstChar { it.uppercase() }
-            _icon.value = response.weather[0].icon
-            notificationManager.updateNotificationContent(
-                icon = icon.value,
-                title = myCity.value,
-                content = "${currentTemp.value}${tempSimbol.value}  ${description.value}"
-            )
+            val current = getCurrentValues(response)
+            _currentWeather.value = current
+
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
@@ -130,6 +121,27 @@ class Repository @Inject constructor(
         } finally {
             appSettings.setCurrentRefresh()
         }
+    }
+
+    private fun getCurrentValues(response: Weather): CurrentWeather {
+        val main = response.main
+        val weat = response.weather[0]
+        val wind = response.wind
+        val current =  CurrentWeather(
+            ((main.temp * 10.0).roundToLong() /10.0).toString(),
+            weat.description.replaceFirstChar { it.uppercase() },
+            weat.icon,
+            main.pressure.toString()+pressureSimbol.value,
+            main.humidity.toString()+humiditySimbol.value,
+            wind.speed.toString()+speedSimbol.value,
+            wind.gust.toString()+speedSimbol.value
+        )
+        notificationManager.updateNotificationContent(
+            icon = current.icon,
+            title = myCity.value,
+            content = "${current.temp}${tempSimbol.value}  ${current.description}"
+        )
+        return current
     }
 
     private suspend fun getSity() {

@@ -16,7 +16,7 @@ class AppSettings(
     private val applicationContext: Context
 ) {
 
-    private val _measurement = MutableStateFlow(1)
+    private val _measurement = MutableStateFlow(0)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
 
     private val _latitude = MutableStateFlow(0.0)

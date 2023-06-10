@@ -1,6 +1,7 @@
 package com.example.weathermaster.ui.weather
 
 import androidx.lifecycle.ViewModel
+import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -12,9 +13,11 @@ class WeatherViewModel @Inject constructor(
 ): ViewModel() {
 
     val myCity: StateFlow<String> = repository.myCity
-    val currentTemp: StateFlow<Double> = repository.currentTemp
-    val description: StateFlow<String> = repository.description
-    val icon: StateFlow<String> = repository.icon
+    val currentWeather: StateFlow<CurrentWeather?> = repository.currentWeather
+
+    //val currentTemp: StateFlow<Double> = repository.currentTemp
+    //val description: StateFlow<String> = repository.description
+    //val icon: StateFlow<String> = repository.icon
 
     val tempSimbol: StateFlow<String> = repository.tempSimbol
     val pressureSimbol: StateFlow<String> = repository.pressureSimbol

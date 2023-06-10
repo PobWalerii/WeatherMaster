@@ -51,11 +51,14 @@ class WeatherFragment : Fragment() {
 
     private fun observeCurrentTemp() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.currentTemp.collect {
-                binding.currentTemp = it
-                binding.simbolTemp = viewModel.tempSimbol.value
-                binding.description = viewModel.description.value
-                binding.icon = viewModel.icon.value
+            viewModel.currentWeather.collect {
+                if(it != null) {
+                    binding.currentWeather = it
+                    //binding.currentTemp = it
+                    binding.simbolTemp = viewModel.tempSimbol.value
+                    //binding.description = viewModel.description.value
+                    //binding.icon = viewModel.icon.value
+                }
             }
         }
     }

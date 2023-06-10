@@ -22,18 +22,27 @@ class LocationService(): Service() {
     @Inject
     lateinit var notificationManager: NotificationManager
 
-    private lateinit var locationClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
+    private lateinit var timeLocationClient: FusedLocationProviderClient
+    private lateinit var distanceLocationClient: FusedLocationProviderClient
+    private lateinit var timeLocationRequest: LocationRequest
+    private lateinit var distanceLocationRequest: LocationRequest
     private var startedLocationTracking = false
-    private var timeInterval: Long = 60000
-    private var minimalDistance: Float = 1000F
+    private var timeInterval: Long = 3600000
+    private var minimalDistance: Float = 10000F
 
-    private val locationCallback = object : LocationCallback() {
+    private val timeLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            locationResult ?: return
-            for (location in locationResult.locations){
-                appSettings.setLocation(location.latitude, location.longitude)
-            }
+            localProcessing(locationResult)
+        }
+    }
+    private val distanceLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            localProcessing(locationResult)
+        }
+    }
+    private fun localProcessing(locationResult: LocationResult) {
+        for (location in locationResult.locations) {
+            appSettings.setLocation(location.latitude, location.longitude)
         }
     }
 
@@ -73,29 +82,38 @@ class LocationService(): Service() {
     @SuppressLint("MissingPermission")
     fun startLocationTracking() {
         if (!startedLocationTracking) {
-            locationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper())
+            timeLocationClient.requestLocationUpdates(
+                timeLocationRequest,
+                timeLocationCallback,
+                Looper.getMainLooper()
+            )
+            distanceLocationClient.requestLocationUpdates(
+                distanceLocationRequest,
+                distanceLocationCallback,
+                Looper.getMainLooper()
+            )
             startedLocationTracking = true
         }
     }
 
     fun stopLocationTracking() {
         if (startedLocationTracking) {
-            locationClient.removeLocationUpdates(locationCallback)
+            timeLocationClient.removeLocationUpdates(timeLocationCallback)
+            distanceLocationClient.removeLocationUpdates(distanceLocationCallback)
         }
     }
 
     private fun setupLocationProviderClient() {
-        locationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
+        timeLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
+        distanceLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
     }
     private fun createLocationRequest() {
-        locationRequest =
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, timeInterval).apply {
-                setMinUpdateDistanceMeters(minimalDistance)
-                setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
-                setWaitForAccurateLocation(false)
-            }.build()
+        timeLocationRequest =
+            LocationRequest.Builder(timeInterval).build()
+        distanceLocationRequest =
+            LocationRequest.Builder(0)
+            .setMinUpdateDistanceMeters(minimalDistance)
+            .build()
     }
 
 
