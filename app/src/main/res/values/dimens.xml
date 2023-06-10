@@ -15,4 +15,5 @@
     <dimen name="current_simbol_size">80sp</dimen>
     <dimen name="current_info_size">18sp</dimen>
     <dimen name="current_ico_size">100dp</dimen>
+    <dimen name="current_content_size">16sp</dimen>
 </resources>

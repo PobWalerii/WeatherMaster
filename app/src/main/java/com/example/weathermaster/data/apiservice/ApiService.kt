@@ -1,5 +1,6 @@
 package com.example.weathermaster.data.apiservice
 
+import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
 import com.example.weathermaster.data.apiservice.response.Weather
 import retrofit2.http.GET
@@ -24,7 +25,13 @@ interface ApiService {
         @Query("appid") apiKey: String
     ): Weather
 
-
+    @GET("data/2.5/forecast")
+    suspend fun getForecast(
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
+        @Query("lang") land: String,
+        @Query("appid") apiKey: String
+    ): Forecast
 
 
 

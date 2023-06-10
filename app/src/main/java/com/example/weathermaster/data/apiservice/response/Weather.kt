@@ -1,7 +1,7 @@
 package com.example.weathermaster.data.apiservice.response
 import com.google.gson.annotations.SerializedName
 
-
+/*
 class Weather(
     @SerializedName("base")
     val base: String,
@@ -94,3 +94,5 @@ class Wind(
     @SerializedName("speed")
     val speed: Double
 )
+
+ */

@@ -6,6 +6,7 @@
     <data>
 
         <import type="com.example.weathermaster.R" />
+        <import type="android.view.View" />
         <variable
             name="city"
             type="String" />
@@ -15,19 +16,6 @@
         <variable
             name="simbolTemp"
             type="String" />
-
-
-
-
-        <!--<variable
-            name="currentTemp"
-            type="Double" />
-        <variable
-            name="description"
-            type="String" />
-        <variable
-            name="icon"
-            type="String" />-->
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,7 +75,7 @@
         <ImageView
             android:id="@+id/weather_icon"
             android:layout_width="@dimen/current_ico_size"
-            android:layout_height="@dimen/current_ico_size"
+            android:layout_height="wrap_content"
             app:showIcon="@{currentWeather.icon}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -98,20 +86,14 @@
             android:id="@+id/other"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="center_horizontal|fill_vertical"
             android:text='@{"Pressure "+currentWeather.pressure + "\nHumidity " + currentWeather.humidity + "\nWind: Speed "+ currentWeather.windSpeed+", Gust " + currentWeather.windGust}'
             android:textColor="@color/white"
-            android:textSize="@dimen/current_info_size"
+            android:textSize="@dimen/current_content_size"
+            android:visibility="@{currentWeather == null ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather_icon" />
-
-
-
-
-
-
-
 
         <ImageView
             android:id="@+id/settings"

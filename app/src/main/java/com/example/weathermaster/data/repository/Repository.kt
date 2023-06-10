@@ -133,8 +133,8 @@ class Repository @Inject constructor(
             weat.icon,
             main.pressure.toString()+pressureSimbol.value,
             main.humidity.toString()+humiditySimbol.value,
-            wind.speed.toString()+speedSimbol.value,
-            wind.gust.toString()+speedSimbol.value
+            ((wind.speed * 10.0).roundToLong() /10.0).toString()+speedSimbol.value,
+            ((wind.gust * 10.0).roundToLong() /10.0).toString()+speedSimbol.value
         )
         notificationManager.updateNotificationContent(
             icon = current.icon,
