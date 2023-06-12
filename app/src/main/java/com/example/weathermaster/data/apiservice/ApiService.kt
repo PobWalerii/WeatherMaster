@@ -1,5 +1,6 @@
 package com.example.weathermaster.data.apiservice
 
+import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
 import com.example.weathermaster.data.apiservice.response.Weather
@@ -23,12 +24,13 @@ interface ApiService {
         @Query("units") units: String,
         @Query("lang") land: String,
         @Query("appid") apiKey: String
-    ): Weather
+    ): Current
 
     @GET("data/2.5/forecast")
     suspend fun getForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
+        @Query("units") units: String,
         @Query("lang") land: String,
         @Query("appid") apiKey: String
     ): Forecast

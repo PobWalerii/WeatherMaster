@@ -1,6 +1,7 @@
 package com.example.weathermaster.ui.weather
 
 import androidx.lifecycle.ViewModel
+import com.example.weathermaster.data.apiservice.result.CurrentForecast
 import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,13 +15,10 @@ class WeatherViewModel @Inject constructor(
 
     val myCity: StateFlow<String> = repository.myCity
     val currentWeather: StateFlow<CurrentWeather?> = repository.currentWeather
-
-    //val currentTemp: StateFlow<Double> = repository.currentTemp
-    //val description: StateFlow<String> = repository.description
-    //val icon: StateFlow<String> = repository.icon
+    val currentForecast: StateFlow<List<CurrentForecast>?> = repository.currentForecast
 
     val tempSimbol: StateFlow<String> = repository.tempSimbol
-    val pressureSimbol: StateFlow<String> = repository.pressureSimbol
-    val speedSimbol: StateFlow<String> = repository.speedSimbol
-    val humiditySimbol: StateFlow<String> = repository.humiditySimbol
+    //val pressureSimbol: StateFlow<String> = repository.pressureSimbol
+    //val speedSimbol: StateFlow<String> = repository.speedSimbol
+    //val humiditySimbol: StateFlow<String> = repository.humiditySimbol
 }

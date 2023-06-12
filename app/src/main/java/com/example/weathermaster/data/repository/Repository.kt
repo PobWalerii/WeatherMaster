@@ -4,7 +4,10 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.example.weathermaster.data.apiservice.ApiService
+import com.example.weathermaster.data.apiservice.response.Current
+import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Weather
+import com.example.weathermaster.data.apiservice.result.CurrentForecast
 import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.notification.NotificationManager
@@ -18,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToLong
@@ -59,6 +64,8 @@ class Repository @Inject constructor(
     private val _currentWeather = MutableStateFlow<CurrentWeather?>(null)
     val currentWeather: StateFlow<CurrentWeather?> = _currentWeather
 
+    private val _currentForecast = MutableStateFlow<List<CurrentForecast>?>(null)
+    val currentForecast: StateFlow<List<CurrentForecast>?> = _currentForecast
     fun init() {
         observeCheckCity()
         observeCurrent()
@@ -81,6 +88,7 @@ class Repository @Inject constructor(
             .collect {(checkCity,currentRefresh) ->
                 if(!checkCity && currentRefresh) {
                     getWeather()
+                    getForecast()
                 }
             }
         }
@@ -98,6 +106,30 @@ class Repository @Inject constructor(
         }
     }
 
+    private suspend fun getForecast() {
+        try {
+            val response = apiService.getForecast(
+                respLatitude,
+                respLongitude,
+                when(measurement.value) {
+                    2 -> MEASUREMENT2
+                    3 -> MEASUREMENT3
+                    else -> MEASUREMENT1
+                },
+                languageCode,
+                API_KEY
+            )
+            val forecast = getForecastValues(response)
+            //_currentForecast.value = forecast
+        } catch  (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+    }
+
     private suspend fun getWeather() {
         try {
             val response = apiService.getWeather(
@@ -111,9 +143,8 @@ class Repository @Inject constructor(
                 languageCode,
                 API_KEY
             )
-            val current = getCurrentValues(response)
+            val current: CurrentWeather = getCurrentValues(response)
             _currentWeather.value = current
-
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
@@ -122,8 +153,73 @@ class Repository @Inject constructor(
             appSettings.setCurrentRefresh()
         }
     }
+    //https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&units=metric&lang=ru&appid=c5eb6539a8f80affa5ce841f35d42a90
+    private fun getForecastValues(response: Forecast): List<CurrentForecast> {
+        val featureList: MutableList<CurrentForecast> = mutableListOf()
+        val list = response.list
+        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        var startDate = "00.00.0000"
+        var minTemp = 0.0
+        var maxTemp = 0.0
+        val descriptionCounts = mutableMapOf<String, Int>()
+        val iconCounts = mutableMapOf<String, Int>()
+        Toast.makeText(applicationContext, "${list.size}", Toast.LENGTH_LONG).show()
+        list.forEach {
+            val main = it.main  // температура, давление, влажность
+            val weat = it.weather[0]  // описание, иконка
+            val dt = it.dt
+            Toast.makeText(applicationContext, "Список", Toast.LENGTH_LONG).show()
+            if (sdf.format(dt) != startDate) {
+                if (startDate != "00.00.0000") {
+                    var maxCount = 0
+                    var dominantDescription = ""
+                    for ((description, count) in descriptionCounts) {
+                        if (count > maxCount) {
+                            dominantDescription = description
+                            maxCount = count
+                        }
+                    }
+                    maxCount = 0
+                    var dominantIcon = ""
+                    for ((icon, count) in iconCounts) {
+                        if (count > maxCount) {
+                            dominantIcon = icon
+                            maxCount = count
+                        }
+                    }
+                    val index = featureList.size
+                    featureList.add(
+                        index,
+                        CurrentForecast(
+                            startDate,
+                            ((minTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value + "/" +
+                                    ((maxTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value + "/",
+                            dominantDescription,
+                            dominantIcon
+                        )
+                    )
+                }
+                minTemp = main.temp
+                maxTemp = main.temp
+                startDate = sdf.format(dt)
+                descriptionCounts.clear()
+                iconCounts.clear()
+            } else {
+                Toast.makeText(applicationContext, "работаем", Toast.LENGTH_LONG).show()
+                if(main.temp<minTemp) minTemp = main.temp
+                if(main.temp>maxTemp) maxTemp = main.temp
+                var counts = iconCounts.getOrDefault(weat.icon, 0)
+                iconCounts[weat.icon] = counts + 1
+                counts = descriptionCounts.getOrDefault(weat.description, 0)
+                descriptionCounts[weat.description] = counts + 1
+            }
+        }
+        _currentForecast.value = featureList
+        //Toast.makeText(applicationContext, "${featureList.size}", Toast.LENGTH_LONG).show()
+        return featureList
+    }
 
-    private fun getCurrentValues(response: Weather): CurrentWeather {
+    private fun getCurrentValues(response: Current): CurrentWeather {
         val main = response.main
         val weat = response.weather[0]
         val wind = response.wind
@@ -150,13 +246,21 @@ class Repository @Inject constructor(
                 latitude.value,
                 longitude.value,
                 1, API_KEY)[0]
-            val localNames = response.local_names
-            val city: String? = localNames.javaClass.declaredFields
+            val localNames = response.localNames
+            var city: String? = localNames.javaClass.declaredFields
                 .firstOrNull { it.name == languageCode }
                 ?.let {
                     it.isAccessible = true
                     it.get(localNames) as? String
                 }
+            if(city.isNullOrEmpty()) {
+                city = localNames.javaClass.declaredFields
+                .firstOrNull { it.name == "en" }
+                    ?.let {
+                        it.isAccessible = true
+                        it.get(localNames) as? String
+                    }
+            }
             if(!city.isNullOrEmpty()) {
                 _myCity.value = city
                 respLatitude = response.lat

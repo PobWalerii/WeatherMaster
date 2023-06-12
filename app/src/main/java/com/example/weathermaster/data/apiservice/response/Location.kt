@@ -1,17 +1,27 @@
 package com.example.weathermaster.data.apiservice.response
+import com.google.gson.annotations.SerializedName
+
 
 class Location : ArrayList<LocationItem>()
 
-data class LocationItem(
+class LocationItem(
+    @SerializedName("country")
     val country: String,
+    @SerializedName("lat")
     val lat: Double,
-    val local_names: LocalNames,
+    @SerializedName("local_names")
+    val localNames: LocalNames,
+    @SerializedName("lon")
     val lon: Double,
+    @SerializedName("name")
     val name: String,
+    @SerializedName("state")
     val state: String
 )
 
 data class LocalNames(
+    val af: String,
+    val al: String,
     val ar: String,
     val az: String,
     val be: String,
@@ -40,12 +50,14 @@ data class LocalNames(
     val `is`: String,
     val `it`: String,
     val ja: String,
+    val kr: String,
     val ka: String,
     val ko: String,
     val ku: String,
     val la: String,
     val lt: String,
     val lv: String,
+    val mk: String,
     val ml: String,
     val ms: String,
     val nl: String,
@@ -56,11 +68,16 @@ data class LocalNames(
     val pt: String,
     val ro: String,
     val ru: String,
+    val sl: String,
+    val sp: String,
     val sk: String,
     val sr: String,
     val sv: String,
+    val th: String,
+    val tr: String,
     val uk: String,
     val vi: String,
     val yi: String,
-    val zh: String
+    val zh: String,
+    val zu: String,
 )
