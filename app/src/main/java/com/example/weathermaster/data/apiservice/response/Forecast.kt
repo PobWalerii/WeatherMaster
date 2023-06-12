@@ -9,7 +9,7 @@ class Forecast(
     @SerializedName("cod")
     val cod: String,
     @SerializedName("list")
-    val list: List<WeatherData>,
+    val listData: List<WeatherData>,
     @SerializedName("message")
     val message: Int
 )

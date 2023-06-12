@@ -1,8 +1,10 @@
 package com.example.weathermaster.data.repository
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
@@ -22,6 +24,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.TextStyle
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -119,7 +123,11 @@ class Repository @Inject constructor(
                 languageCode,
                 API_KEY
             )
-            val forecast = getForecastValues(response)
+            //withContext(Dispatchers.Main) {
+            //    val list = response.listData.size
+            //    Toast.makeText(applicationContext, "$list", Toast.LENGTH_LONG).show()
+            //}
+            getForecastValues(response)
             //_currentForecast.value = forecast
         } catch  (e: Exception) {
             withContext(Dispatchers.Main) {
@@ -154,23 +162,23 @@ class Repository @Inject constructor(
         }
     }
     //https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&units=metric&lang=ru&appid=c5eb6539a8f80affa5ce841f35d42a90
-    private fun getForecastValues(response: Forecast): List<CurrentForecast> {
-        val featureList: MutableList<CurrentForecast> = mutableListOf()
-        val list = response.list
-        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        var startDate = "00.00.0000"
+
+    private fun getForecastValues(response: Forecast) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val featureList: MutableList<CurrentForecast> = mutableListOf()
+            val listData = response.listData
+        var startDate = "0000-00-00"
         var minTemp = 0.0
         var maxTemp = 0.0
         val descriptionCounts = mutableMapOf<String, Int>()
         val iconCounts = mutableMapOf<String, Int>()
-        Toast.makeText(applicationContext, "${list.size}", Toast.LENGTH_LONG).show()
-        list.forEach {
+        listData.forEach {
             val main = it.main  // температура, давление, влажность
             val weat = it.weather[0]  // описание, иконка
-            val dt = it.dt
-            Toast.makeText(applicationContext, "Список", Toast.LENGTH_LONG).show()
-            if (sdf.format(dt) != startDate) {
-                if (startDate != "00.00.0000") {
+            val dt = it.dtTxt
+            val stringDate = dt.substring(0,10)
+            if (stringDate != startDate) {
+                if (startDate != "0000-00-00") {
                     var maxCount = 0
                     var dominantDescription = ""
                     for ((description, count) in descriptionCounts) {
@@ -192,20 +200,20 @@ class Repository @Inject constructor(
                         index,
                         CurrentForecast(
                             startDate,
-                            ((minTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value + "/" +
-                                    ((maxTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value + "/",
-                            dominantDescription,
+                            getDn(startDate).replaceFirstChar { it.uppercase() },
+                            ((minTemp * 10.0).roundToLong() / 10.0).toString() + " / " +
+                                    ((maxTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value,
+                            dominantDescription.replaceFirstChar { it.uppercase() },
                             dominantIcon
                         )
                     )
                 }
                 minTemp = main.temp
                 maxTemp = main.temp
-                startDate = sdf.format(dt)
+                startDate = stringDate
                 descriptionCounts.clear()
                 iconCounts.clear()
             } else {
-                Toast.makeText(applicationContext, "работаем", Toast.LENGTH_LONG).show()
                 if(main.temp<minTemp) minTemp = main.temp
                 if(main.temp>maxTemp) maxTemp = main.temp
                 var counts = iconCounts.getOrDefault(weat.icon, 0)
@@ -215,8 +223,22 @@ class Repository @Inject constructor(
             }
         }
         _currentForecast.value = featureList
-        //Toast.makeText(applicationContext, "${featureList.size}", Toast.LENGTH_LONG).show()
-        return featureList
+         }
+    }
+
+    private fun getDn(startDate: String): String {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val localDate = LocalDate.parse(startDate)
+            val dayOfWeek = localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+            return dayOfWeek
+        } else {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = dateFormat.parse(startDate)
+            val calendar = Calendar.getInstance()
+            calendar.time = date!!
+            val displayName = SimpleDateFormat("EEE", Locale.getDefault()).format(calendar.time)
+            return displayName
+        }
     }
 
     private fun getCurrentValues(response: Current): CurrentWeather {

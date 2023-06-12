@@ -17,12 +17,8 @@
             name="simbolTemp"
             type="String" />
         <variable
-            name="forecast0"
-            type="com.example.weathermaster.data.apiservice.result.CurrentForecast" />
-
-        <variable
             name="forecast"
-            type="java.util.List&lt;com.example.weathermaster.data.apiservice.result.CurrentForecast&gt;" />
+            type="com.example.weathermaster.data.apiservice.result.CurrentForecast" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -72,7 +68,7 @@
             android:id="@+id/weather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{currentWeather.description + "  " + forecast0.temp}'
+            android:text='@{currentWeather.description != null ? currentWeather.description + "  " + (forecast != null ? forecast.temp : ""): ""}'
             android:textColor="@color/white"
             android:textSize="@dimen/current_info_size"
             app:layout_constraintStart_toStartOf="parent"
@@ -101,6 +97,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather_icon" />
+
+        <include
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/string_forecast"
+            app:layout_constraintTop_toBottomOf="@+id/other"/>
+
+        <include
+            android:id="@+id/line2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/string_forecast"
+            app:layout_constraintTop_toBottomOf="@+id/line1"/>
+
+        <include
+            android:id="@+id/line3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/string_forecast"
+            app:layout_constraintTop_toBottomOf="@+id/line2"/>
+
+
 
         <ImageView
             android:id="@+id/settings"

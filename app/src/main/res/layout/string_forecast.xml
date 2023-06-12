@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="forecast"
+            type="com.example.weathermaster.data.apiservice.result.CurrentForecast" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="@dimen/forecast_ico_size"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:showIcon="@{forecast.icon}"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{"  "+forecast.dn + "  " + forecast.description}'
+            android:textColor="@color/white"
+            android:textSize="@dimen/current_content_size"
+            app:layout_constraintStart_toEndOf="@+id/weather_icon"
+            app:layout_constraintTop_toTopOf="@+id/weather_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/weather_icon" />
+
+        <TextView
+            android:id="@+id/weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text='@{forecast.temp}'
+            android:textColor="@color/white"
+            android:textSize="@dimen/current_content_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/weather_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/weather_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -16,4 +16,6 @@
     <dimen name="current_info_size">18sp</dimen>
     <dimen name="current_ico_size">100dp</dimen>
     <dimen name="current_content_size">16sp</dimen>
+
+    <dimen name="forecast_ico_size">40dp</dimen>
 </resources>

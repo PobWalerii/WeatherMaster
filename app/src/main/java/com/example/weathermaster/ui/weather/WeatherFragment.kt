@@ -65,7 +65,10 @@ class WeatherFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentForecast.collect {
                 if(it != null && it.size != 0) {
-                    binding.forecast0 = it[0]
+                    binding.forecast = it[0]
+                    binding.line1.forecast = it[1]
+                    binding.line2.forecast = it[2]
+                    binding.line3.forecast = it[3]
                 }
             }
         }
