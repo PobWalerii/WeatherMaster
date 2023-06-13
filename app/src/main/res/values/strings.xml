@@ -4,6 +4,7 @@
     <string name="settings">Settings</string>
     <string name="detail">Detail information</string>
     <string name="cities">List of Cities</string>
+    <string name="search">City Search</string>
     <string name="measurement">Units of measurement:</string>
     <string name="temperature_Fahrenheit">temperature in Fahrenheit</string>
     <string name="temperature_Celsius">temperature in Celsius</string>

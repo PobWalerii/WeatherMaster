@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.example.weathermaster.R
 import com.example.weathermaster.databinding.FragmentCityListBinding
 import com.example.weathermaster.databinding.FragmentWeatherBinding
@@ -32,6 +33,17 @@ class CityListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBackClickListener()
+        setupKeyPlusClickListener()
+    }
+
+    private fun setupKeyPlusClickListener() {
+        binding.floatingActionButton.setOnClickListener {
+            startCitySearchFragment()
+        }
+    }
+
+    private fun startCitySearchFragment() {
+        findNavController().navigate(CityListFragmentDirections.actionCityListFragmentToCitySearchFragment())
     }
 
     private fun setupBackClickListener() {
