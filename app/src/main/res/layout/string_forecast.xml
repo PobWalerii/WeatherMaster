@@ -10,7 +10,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/forecast_margin">
 
         <ImageView
             android:id="@+id/weather_icon"
@@ -22,17 +23,35 @@
             tools:ignore="ContentDescription" />
 
         <TextView
+            android:id="@+id/dn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{"  "+forecast.dn + "  " + forecast.description}'
+            android:layout_marginStart="@dimen/forecast_margin"
+            android:text="@{forecast.dn}"
             android:textColor="@color/white"
             android:textSize="@dimen/current_content_size"
+            app:layout_constraintBottom_toBottomOf="@+id/weather_icon"
             app:layout_constraintStart_toEndOf="@+id/weather_icon"
-            app:layout_constraintTop_toTopOf="@+id/weather_icon"
-            app:layout_constraintBottom_toBottomOf="@+id/weather_icon" />
+            app:layout_constraintTop_toTopOf="@+id/weather_icon"/>
 
         <TextView
             android:id="@+id/weather"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/forecast_margin"
+            android:inputType="textMultiLine"
+            android:maxLines="2"
+            android:text='@{forecast.description}'
+            android:textColor="@color/white"
+            android:textSize="@dimen/current_content_size"
+            app:layout_constraintBottom_toBottomOf="@+id/weather_icon"
+            app:layout_constraintEnd_toStartOf="@+id/temp"
+            app:layout_constraintStart_toEndOf="@+id/dn"
+            app:layout_constraintTop_toTopOf="@+id/weather_icon"
+            tools:ignore="TextViewEdits" />
+
+        <TextView
+            android:id="@+id/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"

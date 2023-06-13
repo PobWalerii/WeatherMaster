@@ -13,10 +13,27 @@
         <action
             android:id="@+id/action_weatherFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_cityListFragment"
+            app:destination="@id/cityListFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.weathermaster.ui.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/cityListFragment"
+        android:name="com.example.weathermaster.ui.citylist.CityListFragment"
+        android:label="fragment_city_list"
+        tools:layout="@layout/fragment_city_list" >
+        <action
+            android:id="@+id/action_cityListFragment_to_citySearchFragment"
+            app:destination="@id/citySearchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/citySearchFragment"
+        android:name="com.example.weathermaster.ui.citysearch.CitySearchFragment"
+        android:label="fragment_city_search"
+        tools:layout="@layout/fragment_city_search" />
 </navigation>

@@ -89,6 +89,7 @@
             android:id="@+id/other"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/other_margin_top"
             android:gravity="center_horizontal|fill_vertical"
             android:text='@{"Pressure "+currentWeather.pressure + "\nHumidity " + currentWeather.humidity + "\nWind: Speed "+ currentWeather.windSpeed+", Gust " + currentWeather.windGust}'
             android:textColor="@color/white"
@@ -98,28 +99,51 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather_icon" />
 
+        <LinearLayout
+            android:id="@+id/forecast_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="@dimen/forecast_margin"
+            android:layout_marginTop="@dimen/forecast_margin_top"
+            android:background="@drawable/forecast_back"
+            app:layout_constraintTop_toBottomOf="@+id/other"
+            tools:ignore="MissingConstraints">
+
         <include
             android:id="@+id/line1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            layout="@layout/string_forecast"
-            app:layout_constraintTop_toBottomOf="@+id/other"/>
+            android:layout_marginTop="@dimen/forecast_margin"
+            layout="@layout/string_forecast"/>
 
         <include
             android:id="@+id/line2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            layout="@layout/string_forecast"
-            app:layout_constraintTop_toBottomOf="@+id/line1"/>
+            layout="@layout/string_forecast"/>
 
         <include
             android:id="@+id/line3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            layout="@layout/string_forecast"
-            app:layout_constraintTop_toBottomOf="@+id/line2"/>
+            android:layout_marginBottom="@dimen/forecast_margin"
+            layout="@layout/string_forecast"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_back"
+            android:paddingVertical="@dimen/forecast_margin"
+            android:layout_marginHorizontal="@dimen/forecast_margin"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/detail_margin_bottom"
+            android:layout_marginTop="@dimen/forecast_margin"
+            android:text="@string/detail"
+            android:textColor="@color/white"
+            android:textSize="@dimen/current_info_size"/>
 
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/settings"
@@ -132,6 +156,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/title"
             tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/button_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/forecast_back"
+            android:src="@drawable/city"
+            android:layout_marginStart="@dimen/forecast_margin"
+            app:layout_constraintTop_toBottomOf="@id/forecast_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

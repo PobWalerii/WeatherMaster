@@ -40,6 +40,7 @@ class WeatherFragment : Fragment() {
         observeCurrentWeather()
         observeCurrentForecast()
         setupSettingsClickListener()
+        setupCityButtonClickListener()
     }
 
     private fun observeCityName() {
@@ -82,6 +83,16 @@ class WeatherFragment : Fragment() {
 
     private fun startSettingsFragment() {
         findNavController().navigate(WeatherFragmentDirections.actionWeatherFragmentToSettingsFragment())
+    }
+
+    private fun setupCityButtonClickListener() {
+        binding.buttonCity.setOnClickListener {
+            startCityListFragment()
+        }
+    }
+
+    private fun startCityListFragment() {
+        findNavController().navigate(WeatherFragmentDirections.actionWeatherFragmentToCityListFragment())
     }
 
     override fun onDestroyView() {

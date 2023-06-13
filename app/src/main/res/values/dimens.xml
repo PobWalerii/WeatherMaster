@@ -16,6 +16,14 @@
     <dimen name="current_info_size">18sp</dimen>
     <dimen name="current_ico_size">100dp</dimen>
     <dimen name="current_content_size">16sp</dimen>
+    <dimen name="other_margin_top">-10dp</dimen>
 
     <dimen name="forecast_ico_size">40dp</dimen>
+    <dimen name="forecast_margin">10dp</dimen>
+    <dimen name="forecast_margin_top">30dp</dimen>
+    <dimen name="detail_margin_bottom">20dp</dimen>
+
+    <dimen name="list_padding_bottom">80dp</dimen>
+    <dimen name="floating_margin">16dp</dimen>
+
 </resources>

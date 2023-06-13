@@ -8,5 +8,7 @@ data class City(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val cityName: String,
-    val cityMain: Boolean
+    val cityMain: Boolean,
+    val latitude: Double,
+    val longitude: Double
 )
