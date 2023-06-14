@@ -38,6 +38,7 @@ interface ApiService {
     @GET("geo/1.0/direct")
     suspend fun getSearchList(
         @Query("q") cityName: String,
+        @Query("limit") limit: Int,
         @Query("appid") apiKey: String
     ): Location
 

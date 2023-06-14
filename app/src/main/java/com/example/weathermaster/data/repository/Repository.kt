@@ -2,18 +2,14 @@ package com.example.weathermaster.data.repository
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.example.weathermaster.data.apiservice.ApiService
-import com.example.weathermaster.data.apiservice.response.Current
-import com.example.weathermaster.data.apiservice.response.Forecast
-import com.example.weathermaster.data.apiservice.response.Location
-import com.example.weathermaster.data.apiservice.response.Weather
+import com.example.weathermaster.data.apiservice.response.*
 import com.example.weathermaster.data.apiservice.result.CurrentForecast
 import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.apiservice.result.SearchList
 import com.example.weathermaster.data.database.dao.WeatherDao
+import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.API_KEY
@@ -277,8 +273,17 @@ class Repository @Inject constructor(
                 latitude.value,
                 longitude.value,
                 1, API_KEY)[0]
-            val localNames = response.localNames
-            val city = localNames[languageCode] ?: response.name
+            //val localNames = response.localNames
+            //val city = localNames[languageCode] ?: response.name
+            val localNames: Map<String, String> = response.localNames
+            //val city = localNames.get(languageCode) ?: response.name
+            val city =
+                try {
+                    localNames.get(languageCode) ?: response.name
+                } catch (e: Exception) {
+                    response.name
+                }
+
 /*
             var city: String? = localNames.javaClass.declaredFields
                 .firstOrNull { it.name == languageCode }
@@ -318,14 +323,16 @@ class Repository @Inject constructor(
             _isLoadData.value = true
             _searchList.value = emptyList()
             try {
-                val response = apiService.getSearchList(
+                val response: Location = apiService.getSearchList(
                     keyWord,
+                    10,
                     API_KEY
                 )
-                getCityList(response)
+                val list: List<SearchList> = toCityList(response, languageCode)
+                _searchList.value = list
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_LONG).show()
                 }
             } finally {
                 _isLoadData.value = false
@@ -333,23 +340,6 @@ class Repository @Inject constructor(
         }
     }
 
-    private fun getCityList(response: Location) {
-        val list: MutableList<SearchList> = mutableListOf()
-        response.map {
-            val localNames = it.localNames
-            val city: String = localNames[languageCode] ?: it.name
-            val countryName: String = Locale("", it.country).displayCountry
-            Toast.makeText(applicationContext, "$city $countryName", Toast.LENGTH_SHORT).show()
-            list.add(SearchList(
-                city,
-                it.lat,
-                it.lon,
-                it.country,
-                countryName
-            ))
-        }
-        _searchList.value = list
 
-    }
 
 }

@@ -49,14 +49,15 @@ class CitySearchFragment : Fragment() {
 
     private fun observeLoadData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            combine(viewModel.isLoadData,viewModel.searchList) {
-                    isLoadData,searchList -> Pair(isLoadData, searchList)
-            }.collect {(isLoadData, searchList) ->
-                if(!isLoadData && searchList.isEmpty()) {
-                    Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "${searchList.size}", Toast.LENGTH_SHORT).show()
-
+            combine(viewModel.searchList, viewModel.waitingData) {
+                    searchList,waitingData -> Pair(searchList,waitingData)
+            }.collect {(searchList,waitingData) ->
+                if( waitingData ) {
+                    if (searchList.isEmpty()) {
+                        Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "List - ${searchList.size}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

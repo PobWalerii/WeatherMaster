@@ -10,7 +10,7 @@ class LocationItem(
     @SerializedName("lat")
     val lat: Double,
     @SerializedName("local_names")
-    val localNames: Map<String, String>,//LocalNames,
+    val localNames: Map<String, String>,
     @SerializedName("lon")
     val lon: Double,
     @SerializedName("name")
