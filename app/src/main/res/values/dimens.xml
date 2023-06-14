@@ -28,6 +28,9 @@
     <dimen name="floating_margin">16dp</dimen>
 
     <dimen name="text_searh_size">18sp</dimen>
-    <dimen name="text_searh_margin">10dp</dimen>
+    <dimen name="searh_margin_horizontal">10dp</dimen>
+    <dimen name="searh_margin_top">20dp</dimen>
+    <dimen name="search_button_size">50dp</dimen>
+    <dimen name="progress_size">70dp</dimen>
 
 </resources>

@@ -8,9 +8,11 @@ import androidx.annotation.RequiresApi
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
+import com.example.weathermaster.data.apiservice.response.Location
 import com.example.weathermaster.data.apiservice.response.Weather
 import com.example.weathermaster.data.apiservice.result.CurrentForecast
 import com.example.weathermaster.data.apiservice.result.CurrentWeather
+import com.example.weathermaster.data.apiservice.result.SearchList
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
@@ -70,6 +72,13 @@ class Repository @Inject constructor(
 
     private val _currentForecast = MutableStateFlow<List<CurrentForecast>?>(null)
     val currentForecast: StateFlow<List<CurrentForecast>?> = _currentForecast
+
+    private val _isLoadData = MutableStateFlow(false)
+    val isLoadData: StateFlow<Boolean> = _isLoadData.asStateFlow()
+
+    private val _searchList = MutableStateFlow<List<SearchList>>(emptyList())
+    val searchList: StateFlow<List<SearchList>> = _searchList
+
     fun init() {
         observeCheckCity()
         observeCurrent()
@@ -269,6 +278,8 @@ class Repository @Inject constructor(
                 longitude.value,
                 1, API_KEY)[0]
             val localNames = response.localNames
+            val city = localNames[languageCode] ?: response.name
+/*
             var city: String? = localNames.javaClass.declaredFields
                 .firstOrNull { it.name == languageCode }
                 ?.let {
@@ -283,7 +294,11 @@ class Repository @Inject constructor(
                         it.get(localNames) as? String
                     }
             }
-            if(!city.isNullOrEmpty()) {
+
+ */
+
+
+            if(!city.isEmpty()) {
                 _myCity.value = city
                 respLatitude = response.lat
                 respLongitude = response.lon
@@ -296,4 +311,45 @@ class Repository @Inject constructor(
             appSettings.setCheckCity()
         }
     }
+
+
+    fun getSearchList(keyWord: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            _isLoadData.value = true
+            _searchList.value = emptyList()
+            try {
+                val response = apiService.getSearchList(
+                    keyWord,
+                    API_KEY
+                )
+                getCityList(response)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                }
+            } finally {
+                _isLoadData.value = false
+            }
+        }
+    }
+
+    private fun getCityList(response: Location) {
+        val list: MutableList<SearchList> = mutableListOf()
+        response.map {
+            val localNames = it.localNames
+            val city: String = localNames[languageCode] ?: it.name
+            val countryName: String = Locale("", it.country).displayCountry
+            Toast.makeText(applicationContext, "$city $countryName", Toast.LENGTH_SHORT).show()
+            list.add(SearchList(
+                city,
+                it.lat,
+                it.lon,
+                it.country,
+                countryName
+            ))
+        }
+        _searchList.value = list
+
+    }
+
 }

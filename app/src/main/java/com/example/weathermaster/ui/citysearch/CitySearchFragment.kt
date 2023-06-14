@@ -1,21 +1,31 @@
 package com.example.weathermaster.ui.citysearch
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.weathermaster.R
 import com.example.weathermaster.databinding.FragmentCitySearchBinding
-import com.example.weathermaster.databinding.FragmentWeatherBinding
 import com.example.weathermaster.ui.main.MainActivity
+import com.example.weathermaster.utils.HideKeyboard.hideKeyboardFromView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
+
 
 @AndroidEntryPoint
 class CitySearchFragment : Fragment() {
     private var _binding: FragmentCitySearchBinding? = null
     private val binding get() = requireNotNull(_binding)
+
+    private val viewModel by viewModels<SearchViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,28 +43,52 @@ class CitySearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBackClickListener()
         setOnSearchClickListener()
+        observeIsLoadData()
+        observeLoadData()
+    }
+
+    private fun observeLoadData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(viewModel.isLoadData,viewModel.searchList) {
+                    isLoadData,searchList -> Pair(isLoadData, searchList)
+            }.collect {(isLoadData, searchList) ->
+                if(!isLoadData && searchList.isEmpty()) {
+                    Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "${searchList.size}", Toast.LENGTH_SHORT).show()
+
+                }
+            }
+        }
+    }
+
+    private fun observeIsLoadData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isLoadData.collect {
+                binding.isLoadData = it
+            }
+        }
     }
 
     private fun setOnSearchClickListener() {
         binding.search.setOnClickListener {
-            Toast.makeText(context,"Click button",Toast.LENGTH_LONG).show()
-            /*
-            val textView = binding.appBarLayout.textSearch
+            val textView = binding.textSearch
             val keyWord = textView.text.toString()
             if (keyWord.isNotEmpty()) {
-                viewModel.keyWordForSearh = keyWord
-                viewModel.isSearhResponse = true
                 hideKeyboardFromView(textView.context, textView)
                 textView.isCursorVisible = false
-                getVideoList(keyWord)
+                viewModel.getSearchList(keyWord)
             }
-
-             */
         }
-
         binding.textSearch.setOnClickListener {
-            Toast.makeText(context,"Click",Toast.LENGTH_LONG).show()
             binding.textSearch.isCursorVisible = true
+        }
+        binding.textSearch.setOnEditorActionListener { textView, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                textView.isCursorVisible = false
+                return@setOnEditorActionListener true
+            }
+            false
         }
     }
 

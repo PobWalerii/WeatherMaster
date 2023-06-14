@@ -10,7 +10,7 @@ class LocationItem(
     @SerializedName("lat")
     val lat: Double,
     @SerializedName("local_names")
-    val localNames: LocalNames,
+    val localNames: Map<String, String>,//LocalNames,
     @SerializedName("lon")
     val lon: Double,
     @SerializedName("name")
@@ -20,6 +20,8 @@ class LocationItem(
 )
 
 data class LocalNames(
+    val names: Map<String, String>
+    /*
     val af: String,
     val al: String,
     val ar: String,
@@ -80,4 +82,6 @@ data class LocalNames(
     val yi: String,
     val zh: String,
     val zu: String,
+
+     */
 )

@@ -35,12 +35,10 @@ interface ApiService {
         @Query("appid") apiKey: String
     ): Forecast
 
-
-
-
-
-
-
-
+    @GET("geo/1.0/direct")
+    suspend fun getSearchList(
+        @Query("q") cityName: String,
+        @Query("appid") apiKey: String
+    ): Location
 
 }
