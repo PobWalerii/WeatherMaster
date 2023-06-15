@@ -3,6 +3,7 @@ package com.example.weathermaster.data.repository
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
+import androidx.room.Query
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.*
 import com.example.weathermaster.data.apiservice.result.CurrentForecast
@@ -10,6 +11,7 @@ import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.database.entity.City
+import com.example.weathermaster.data.mapers.Mapers.getCityFromResponse
 import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
@@ -86,7 +88,7 @@ class Repository @Inject constructor(
         CoroutineScope(Dispatchers.Default).launch {
             checkCity.collect {
                 if(it) {
-                    getSity()
+                    getCity()
                 }
             }
         }
@@ -268,47 +270,25 @@ class Repository @Inject constructor(
         return current
     }
 
-    private suspend fun getSity() {
+    private suspend fun getCity() {
         try {
-            val response = apiService.getCity(
+            val response: LocationItem = apiService.getCity(
                 latitude.value,
                 longitude.value,
                 1, API_KEY)[0]
-            //val localNames = response.localNames
-            //val city = localNames[languageCode] ?: response.name
-            val localNames: Map<String, String> = response.localNames
-            //val city = localNames.get(languageCode) ?: response.name
-            val city =
-                try {
-                    localNames.get(languageCode) ?: response.name
-                } catch (e: Exception) {
-                    response.name
-                }
-
-/*
-            var city: String? = localNames.javaClass.declaredFields
-                .firstOrNull { it.name == languageCode }
-                ?.let {
-                    it.isAccessible = true
-                    it.get(localNames) as? String
-                }
-            if(city.isNullOrEmpty()) {
-                city = localNames.javaClass.declaredFields
-                .firstOrNull { it.name == "en" }
-                    ?.let {
-                        it.isAccessible = true
-                        it.get(localNames) as? String
-                    }
-            }
-
- */
+            val city: SearchListItem = getCityFromResponse(response, languageCode)
+            val cityInBase: City = weatherDao.getCityByLocation(city.latitude,city.longitude)
 
 
-            if(!city.isEmpty()) {
-                _myCity.value = city
-                respLatitude = response.lat
-                respLongitude = response.lon
-            }
+
+
+
+
+
+            _myCity.value = city.cityName
+            respLatitude = city.latitude
+            respLongitude = city.longitude
+
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
