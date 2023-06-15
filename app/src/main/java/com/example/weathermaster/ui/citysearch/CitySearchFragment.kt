@@ -9,15 +9,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
+import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.databinding.FragmentCitySearchBinding
 import com.example.weathermaster.ui.main.MainActivity
 import com.example.weathermaster.utils.HideKeyboard.hideKeyboardFromView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 
 
 @AndroidEntryPoint
@@ -27,9 +27,8 @@ class CitySearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var adapter: SearchListAdapter
+    private lateinit var recycler: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,26 +40,54 @@ class CitySearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupAdapter()
+        setupRecycler()
         setupBackClickListener()
         setOnSearchClickListener()
         observeIsLoadData()
         observeLoadData()
+        setupAddClickListener()
+    }
+
+    private fun setupAdapter() {
+        adapter = SearchListAdapter()
+        adapter.setHasStableIds(true)
+    }
+
+    private fun setupRecycler() {
+        recycler = binding.recycler
+        recycler.adapter = adapter
     }
 
     private fun observeLoadData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            combine(viewModel.searchList, viewModel.waitingData) {
-                    searchList,waitingData -> Pair(searchList,waitingData)
-            }.collect {(searchList,waitingData) ->
-                if( waitingData ) {
+            combine(viewModel.searchListItem, viewModel.isLoadData) {
+                    searchList, isLoadData -> Pair(searchList, isLoadData)
+            }.collect { (searchList, isLoadData) ->
+                if( searchList!=null && !isLoadData) {
                     if (searchList.isEmpty()) {
                         Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "List - ${searchList.size}", Toast.LENGTH_SHORT).show()
+                        adapter.setList(searchList)
                     }
+                } else if(searchList==null) {
+                    adapter.setList(emptyList())
                 }
             }
         }
+    }
+
+    private fun setupAddClickListener() {
+        adapter.setOnItemClickListener(object : SearchListAdapter.OnItemClickListener {
+            override fun onItemClick(curren: SearchListItem) {
+                addCityToList(curren)
+            }
+        })
+    }
+
+    private fun addCityToList(current: SearchListItem) {
+        viewModel.addCity(current)
+        (activity as MainActivity).onSupportNavigateUp()
     }
 
     private fun observeIsLoadData() {

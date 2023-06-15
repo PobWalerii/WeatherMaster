@@ -1,14 +1,10 @@
 package com.example.weathermaster.ui.citysearch
 
 import androidx.lifecycle.ViewModel
-import com.example.weathermaster.data.apiservice.result.CurrentForecast
-import com.example.weathermaster.data.apiservice.result.CurrentWeather
-import com.example.weathermaster.data.apiservice.result.SearchList
+import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.data.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,13 +13,17 @@ class SearchViewModel @Inject constructor(
 ): ViewModel() {
 
     val isLoadData: StateFlow<Boolean> = repository.isLoadData
-    val searchList: StateFlow<List<SearchList>> = repository.searchList
+    val searchListItem: StateFlow<List<SearchListItem>?> = repository.searchListItem
 
-    var _waitingData = MutableStateFlow(false)
-    val waitingData: StateFlow<Boolean> = _waitingData.asStateFlow()
+    init {
+        repository.searchListToNull()
+    }
 
     fun getSearchList(keyWord: String) {
-        _waitingData.value = true
         repository.getSearchList(keyWord)
+    }
+
+    fun addCity(current: SearchListItem) {
+        repository.addCity(current)
     }
 }

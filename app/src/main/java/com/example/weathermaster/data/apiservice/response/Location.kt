@@ -16,7 +16,7 @@ class LocationItem(
     @SerializedName("name")
     val name: String,
     @SerializedName("state")
-    val state: String
+    val state: String?
 )
 
 data class LocalNames(

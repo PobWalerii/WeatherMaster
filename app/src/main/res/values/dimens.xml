@@ -32,5 +32,16 @@
     <dimen name="searh_margin_top">20dp</dimen>
     <dimen name="search_button_size">50dp</dimen>
     <dimen name="progress_size">70dp</dimen>
+    <dimen name="recycler_margin_horizontal">15dp</dimen>
+
+
+
+    <dimen name="search_item_name_size">18sp</dimen>
+    <dimen name="search_item_info_size">16sp</dimen>
+    <dimen name="search_item_plus_size">30dp</dimen>
+    <dimen name="search_item_margin_bottom">10dp</dimen>
+
+
+
 
 </resources>

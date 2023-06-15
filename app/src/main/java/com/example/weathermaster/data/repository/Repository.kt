@@ -7,8 +7,9 @@ import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.*
 import com.example.weathermaster.data.apiservice.result.CurrentForecast
 import com.example.weathermaster.data.apiservice.result.CurrentWeather
-import com.example.weathermaster.data.apiservice.result.SearchList
+import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
+import com.example.weathermaster.data.database.entity.City
 import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
@@ -72,8 +73,8 @@ class Repository @Inject constructor(
     private val _isLoadData = MutableStateFlow(false)
     val isLoadData: StateFlow<Boolean> = _isLoadData.asStateFlow()
 
-    private val _searchList = MutableStateFlow<List<SearchList>>(emptyList())
-    val searchList: StateFlow<List<SearchList>> = _searchList
+    private val _searchListItem = MutableStateFlow<List<SearchListItem>?>(null)
+    val searchListItem: StateFlow<List<SearchListItem>?> = _searchListItem
 
     fun init() {
         observeCheckCity()
@@ -321,15 +322,14 @@ class Repository @Inject constructor(
     fun getSearchList(keyWord: String) {
         CoroutineScope(Dispatchers.Default).launch {
             _isLoadData.value = true
-            _searchList.value = emptyList()
             try {
                 val response: Location = apiService.getSearchList(
                     keyWord,
                     10,
                     API_KEY
                 )
-                val list: List<SearchList> = toCityList(response, languageCode)
-                _searchList.value = list
+                val list: List<SearchListItem> = toCityList(response, languageCode)
+                _searchListItem.value = list
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_LONG).show()
@@ -339,7 +339,25 @@ class Repository @Inject constructor(
             }
         }
     }
+    fun searchListToNull() {
+        _searchListItem.value = null
+    }
 
+    fun addCity(current: SearchListItem) {
+        CoroutineScope(Dispatchers.IO).launch {
+            weatherDao.insertCity(
+                City(
+                    0,
+                    current.cityName,
+                    current.latitude,
+                    current.longitude,
+                    current.country,
+                    current.countryName,
+                    current.state
+                )
+            )
+        }
+    }
 
 
 }
