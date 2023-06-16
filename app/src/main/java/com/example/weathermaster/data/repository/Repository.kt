@@ -283,46 +283,53 @@ class Repository @Inject constructor(
 
     private suspend fun getCity() {
         try {
-            val response: LocationItem = apiService.getCity(
-                latitude.value,
-                longitude.value,
-                1, API_KEY)[0]
-            val city: SearchListItem = getCityFromResponse(response, languageCode)
-            val cityInBaseList: List<City> = weatherDao.getCityByLocation(city.latitude,city.longitude)
+            val city: SearchListItem? = getCityFromLocation(latitude.value, longitude.value)
 
-            val cityId = if(cityInBaseList.size == 0) {
-                weatherDao.insertCity(
-                    City(
-                        0,
-                        0,
-                        city.cityName,
-                        city.latitude,
-                        city.longitude,
-                        city.country,
-                        city.countryName,
-                        city.state
-                    )
-                )
-            } else {
-                cityInBaseList[0].id
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    applicationContext,
+                    "${latitude.value} - ${city?.latitude}, ${latitude.value} - ${city?.longitude}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-            val cityList = weatherDao.loadCityList()
-            var number = 0
-            cityList.map {
-                if(it.id == cityId) {
-                    if(it.number != 0) {
-                        weatherDao.updateCityNumber(it.id, 0)
-                    }
+
+            if(city != null) {
+                val cityInBaseList: List<City> =
+                    weatherDao.getCityByLocation(city.latitude, city.longitude)
+                val cityId = if (cityInBaseList.size == 0) {
+                    weatherDao.insertCity(
+                        City(
+                            0,
+                            0,
+                            city.cityName,
+                            city.latitude,
+                            city.longitude,
+                            city.country,
+                            city.countryName,
+                            city.state
+                        )
+                    )
                 } else {
-                    number++
-                    if(it.number != number) {
-                        weatherDao.updateCityNumber(it.id, number)
+                    cityInBaseList[0].id
+                }
+                val cityList = weatherDao.loadCityList()
+                var number = 0
+                cityList.map {
+                    if (it.id == cityId) {
+                        if (it.number != 0) {
+                            weatherDao.updateCityNumber(it.id, 0)
+                        }
+                    } else {
+                        number++
+                        if (it.number != number) {
+                            weatherDao.updateCityNumber(it.id, number)
+                        }
                     }
                 }
+                _myCity.value = city.cityName
+                respLatitude = city.latitude
+                respLongitude = city.longitude
             }
-            _myCity.value = city.cityName
-            respLatitude = city.latitude
-            respLongitude = city.longitude
 
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
@@ -363,33 +370,65 @@ class Repository @Inject constructor(
 
     fun addCity(current: SearchListItem) {
         CoroutineScope(Dispatchers.IO).launch {
-            if(weatherDao.getCityByLocation(current.latitude, current.longitude).size ==0) {
-                val cityList = weatherDao.loadCityList()
-                val listSize = cityList.size
-                val number =
-                    if (listSize == 0) {
-                        1
-                    } else {
-                        cityList[listSize - 1].number + 1
-                    }
-                weatherDao.insertCity(
-                    City(
-                        0,
-                        number,
-                        current.cityName,
-                        current.latitude,
-                        current.longitude,
-                        current.country,
-                        current.countryName,
-                        current.state
+            val city: SearchListItem? = getCityFromLocation(current.latitude, current.longitude)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    applicationContext,
+                    "${respLatitude} - ${city?.latitude}, ${respLongitude} - ${city?.longitude}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            if(city != null) {
+                if (weatherDao.getCityByLocation(city.latitude, city.longitude).size == 0) {
+                    val cityList = weatherDao.loadCityList()
+                    val listSize = cityList.size
+                    val number =
+                        if (listSize == 0) {
+                            1
+                        } else {
+                            cityList[listSize - 1].number + 1
+                        }
+                    weatherDao.insertCity(
+                        City(
+                            0,
+                            number,
+                            city.cityName,
+                            city.latitude,
+                            city.longitude,
+                            city.country,
+                            city.countryName,
+                            city.state
+                        )
                     )
-                )
-                _addCityResult.value = true
-            } else {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(applicationContext, "Такой город уже внесен в список", Toast.LENGTH_LONG).show()
+                    _addCityResult.value = true
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Такой город уже внесен в список",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
+        }
+    }
+
+    private suspend fun getCityFromLocation(latitude: Double, longitude: Double): SearchListItem? {
+        try {
+            val response: LocationItem = apiService.getCity(
+                latitude,
+                longitude,
+                1, API_KEY
+            )[0]
+            val city: SearchListItem = getCityFromResponse(response, languageCode)
+            return city
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+            }
+            return null
         }
     }
 
