@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.result.SearchListItem
@@ -32,7 +31,7 @@ class SearchListAdapter: RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
         val binding = holder.getBinding()
 
         binding.actionButton.setOnClickListener {
-            listener?.onItemClick(listCity[holder.layoutPosition])
+            listener?.onItemClick( listCity[holder.layoutPosition] )
         }
         return holder
     }
@@ -41,11 +40,11 @@ class SearchListAdapter: RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
         this.listener = listener
     }
     interface OnItemClickListener {
-        fun onItemClick(curren: SearchListItem)
+        fun onItemClick(currentItem: SearchListItem)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listCity[position])
+        holder.bind( listCity[position] )
     }
 
     override fun getItemCount(): Int = listCity.size

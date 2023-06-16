@@ -37,7 +37,6 @@
             app:layout_constraintTop_toTopOf="@+id/title"
             tools:ignore="ContentDescription" />
 
-
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/coordinator"
             android:layout_width="match_parent"
@@ -62,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:backgroundTint="@color/dark_blue"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/floating_margin"
                 android:clickable="true"
                 android:focusable="true"
                 android:src="@android:drawable/ic_input_add"

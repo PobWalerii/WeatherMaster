@@ -14,9 +14,11 @@ class SearchViewModel @Inject constructor(
 
     val isLoadData: StateFlow<Boolean> = repository.isLoadData
     val searchListItem: StateFlow<List<SearchListItem>?> = repository.searchListItem
+    val addCityResult: StateFlow<Boolean> = repository.addCityResult
 
     init {
         repository.searchListToNull()
+        repository.setAddCityResult()
     }
 
     fun getSearchList(keyWord: String) {

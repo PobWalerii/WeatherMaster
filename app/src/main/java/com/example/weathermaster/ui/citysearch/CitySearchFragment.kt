@@ -47,6 +47,7 @@ class CitySearchFragment : Fragment() {
         observeIsLoadData()
         observeLoadData()
         setupAddClickListener()
+        observeAddCityResult()
     }
 
     private fun setupAdapter() {
@@ -61,16 +62,16 @@ class CitySearchFragment : Fragment() {
 
     private fun observeLoadData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            combine(viewModel.searchListItem, viewModel.isLoadData) {
-                    searchList, isLoadData -> Pair(searchList, isLoadData)
+            combine(viewModel.searchListItem, viewModel.isLoadData) { searchList, isLoadData ->
+                Pair(searchList, isLoadData)
             }.collect { (searchList, isLoadData) ->
-                if( searchList!=null && !isLoadData) {
+                if (searchList != null && !isLoadData) {
                     if (searchList.isEmpty()) {
                         Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
                     } else {
                         adapter.setList(searchList)
                     }
-                } else if(searchList==null) {
+                } else if (searchList == null) {
                     adapter.setList(emptyList())
                 }
             }
@@ -79,15 +80,14 @@ class CitySearchFragment : Fragment() {
 
     private fun setupAddClickListener() {
         adapter.setOnItemClickListener(object : SearchListAdapter.OnItemClickListener {
-            override fun onItemClick(curren: SearchListItem) {
-                addCityToList(curren)
+            override fun onItemClick(currentItem: SearchListItem) {
+                addCityToList(currentItem)
             }
         })
     }
 
     private fun addCityToList(current: SearchListItem) {
         viewModel.addCity(current)
-        (activity as MainActivity).onSupportNavigateUp()
     }
 
     private fun observeIsLoadData() {
@@ -99,6 +99,7 @@ class CitySearchFragment : Fragment() {
     }
 
     private fun setOnSearchClickListener() {
+
         binding.search.setOnClickListener {
             val textView = binding.textSearch
             val keyWord = textView.text.toString()
@@ -108,15 +109,27 @@ class CitySearchFragment : Fragment() {
                 viewModel.getSearchList(keyWord)
             }
         }
+
         binding.textSearch.setOnClickListener {
             binding.textSearch.isCursorVisible = true
         }
+
         binding.textSearch.setOnEditorActionListener { textView, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 textView.isCursorVisible = false
                 return@setOnEditorActionListener true
             }
             false
+        }
+    }
+
+    private fun observeAddCityResult() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.addCityResult.collect {
+                if (it) {
+                    (activity as MainActivity).onSupportNavigateUp()
+                }
+            }
         }
     }
 

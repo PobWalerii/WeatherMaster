@@ -78,6 +78,9 @@ class Repository @Inject constructor(
     private val _searchListItem = MutableStateFlow<List<SearchListItem>?>(null)
     val searchListItem: StateFlow<List<SearchListItem>?> = _searchListItem
 
+    private val _addCityResult = MutableStateFlow(false)
+    val addCityResult: StateFlow<Boolean> = _addCityResult
+
     fun init() {
         observeCheckCity()
         observeCurrent()
@@ -270,6 +273,14 @@ class Repository @Inject constructor(
         return current
     }
 
+
+
+
+
+
+
+
+
     private suspend fun getCity() {
         try {
             val response: LocationItem = apiService.getCity(
@@ -277,14 +288,38 @@ class Repository @Inject constructor(
                 longitude.value,
                 1, API_KEY)[0]
             val city: SearchListItem = getCityFromResponse(response, languageCode)
-            val cityInBase: City = weatherDao.getCityByLocation(city.latitude,city.longitude)
+            val cityInBaseList: List<City> = weatherDao.getCityByLocation(city.latitude,city.longitude)
 
-
-
-
-
-
-
+            val cityId = if(cityInBaseList.size == 0) {
+                weatherDao.insertCity(
+                    City(
+                        0,
+                        0,
+                        city.cityName,
+                        city.latitude,
+                        city.longitude,
+                        city.country,
+                        city.countryName,
+                        city.state
+                    )
+                )
+            } else {
+                cityInBaseList[0].id
+            }
+            val cityList = weatherDao.loadCityList()
+            var number = 0
+            cityList.map {
+                if(it.id == cityId) {
+                    if(it.number != 0) {
+                        weatherDao.updateCityNumber(it.id, 0)
+                    }
+                } else {
+                    number++
+                    if(it.number != number) {
+                        weatherDao.updateCityNumber(it.id, number)
+                    }
+                }
+            }
             _myCity.value = city.cityName
             respLatitude = city.latitude
             respLongitude = city.longitude
@@ -297,7 +332,6 @@ class Repository @Inject constructor(
             appSettings.setCheckCity()
         }
     }
-
 
     fun getSearchList(keyWord: String) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -319,25 +353,47 @@ class Repository @Inject constructor(
             }
         }
     }
+
     fun searchListToNull() {
         _searchListItem.value = null
+    }
+    fun setAddCityResult() {
+        _addCityResult.value = false
     }
 
     fun addCity(current: SearchListItem) {
         CoroutineScope(Dispatchers.IO).launch {
-            weatherDao.insertCity(
-                City(
-                    0,
-                    current.cityName,
-                    current.latitude,
-                    current.longitude,
-                    current.country,
-                    current.countryName,
-                    current.state
+            if(weatherDao.getCityByLocation(current.latitude, current.longitude).size ==0) {
+                val cityList = weatherDao.loadCityList()
+                val listSize = cityList.size
+                val number =
+                    if (listSize == 0) {
+                        1
+                    } else {
+                        cityList[listSize - 1].number + 1
+                    }
+                weatherDao.insertCity(
+                    City(
+                        0,
+                        number,
+                        current.cityName,
+                        current.latitude,
+                        current.longitude,
+                        current.country,
+                        current.countryName,
+                        current.state
+                    )
                 )
-            )
+                _addCityResult.value = true
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(applicationContext, "Такой город уже внесен в список", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
+
+    suspend fun loadCityList() = weatherDao.loadCityList()
 
 
 }

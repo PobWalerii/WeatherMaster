@@ -4,7 +4,7 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="com.example.weathermaster.data.apiservice.result.SearchListItem" />
+            type="com.example.weathermaster.data.database.entity.City" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,6 +12,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/forecast_back"
         android:layout_marginBottom="@dimen/search_item_margin_bottom">
 
         <LinearLayout
@@ -20,7 +21,7 @@
             android:layout_weight="1"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/actionButton"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -48,15 +49,7 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/actionButton"
-            android:layout_width="@dimen/search_item_plus_size"
-            android:layout_height="@dimen/search_item_plus_size"
-            android:src="@drawable/add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

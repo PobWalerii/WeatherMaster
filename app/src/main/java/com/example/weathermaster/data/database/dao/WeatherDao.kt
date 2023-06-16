@@ -7,12 +7,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WeatherDao {
     @Query("SELECT * FROM City ORDER BY number")
-    fun loadCityList(): Flow<List<City>>
+    suspend fun loadCityList(): List<City>
 
     @Query("SELECT * FROM City WHERE latitude = :lat AND longitude = :lon")
-    suspend fun getCityByLocation(lat: Double, lon: Double): City
+    suspend fun getCityByLocation(lat: Double, lon: Double): List<City>
 
-
+    @Query("UPDATE City SET number = :newNumber WHERE id = :cityId")
+    suspend fun updateCityNumber(cityId: Long, newNumber: Int)
 
 
 
