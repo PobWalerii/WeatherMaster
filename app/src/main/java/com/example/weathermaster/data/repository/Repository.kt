@@ -45,7 +45,7 @@ class Repository @Inject constructor(
     private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
     private val isPermissionStatus: StateFlow<Boolean> = appSettings.isPermissionStatus
 
-    private val isNotification: StateFlow<Boolean> = notificationManager.isNotification
+    //private val isNotification: StateFlow<Boolean> = notificationManager.isNotification
 
     val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
         .map { list ->
@@ -87,10 +87,8 @@ class Repository @Inject constructor(
 
     private fun showNotification() {
         CoroutineScope(Dispatchers.Default).launch {
-            combine(listCityAndWeather, isNotification) { list, notifi ->
-                Pair(list, notifi)
-            }.collect { (list, notifi) ->
-                if (notifi && list.isNotEmpty()) {
+            listCityAndWeather.collect { list ->
+                if (list.isNotEmpty()) {
                     val current = list[0]
                     if (current.number == 0) {
                         notificationManager.updateNotificationContent(
@@ -102,6 +100,27 @@ class Repository @Inject constructor(
             }
         }
     }
+
+/*
+    private fun showNotification() {
+        CoroutineScope(Dispatchers.Default).launch {
+            combine(listCityAndWeather, isNotification) { list, notifi ->
+                Pair(list, notifi)
+            }.collect { (list, notifi) ->
+                if (list.isNotEmpty()) {
+                    val current = list[0]
+                    if (current.number == 0) {
+                        notificationManager.updateNotificationContent(
+                            current.cityName,
+                            "${current.temp}${current.tempSimbol}  ${current.description}"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+ */
 
 
     private fun observePermission() {

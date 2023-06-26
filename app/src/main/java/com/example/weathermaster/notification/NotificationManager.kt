@@ -32,8 +32,8 @@ class NotificationManager @Inject constructor(
     private val context: Context
 ) {
 
-    private val _isNotification = MutableStateFlow(false)
-    val isNotification: StateFlow<Boolean> = _isNotification.asStateFlow()
+    //private val _isNotification = MutableStateFlow(false)
+    //val isNotification: StateFlow<Boolean> = _isNotification.asStateFlow()
 
     private val notificationManager: NotificationManager by lazy {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -60,7 +60,7 @@ class NotificationManager @Inject constructor(
             .setSmallIcon(R.drawable.small)
             .setContentTitle(title)
             .setContentText(content)
-        _isNotification.value = true
+        //_isNotification.value = true
         return notificationBuilder.build()
     }
 
