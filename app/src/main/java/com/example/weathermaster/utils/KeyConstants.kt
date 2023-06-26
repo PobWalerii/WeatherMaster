@@ -12,4 +12,6 @@ object KeyConstants {
     const val MEASUREMENT2 = "metric"
     const val MEASUREMENT3 = "imperial"
     const val NOTIFICATION_ID = 1234512345
+    const val CHECK_LOCATION_TIME_INTERVAL = 1
+    const val CHECK_LOCATION_DISTANCE = 10000F
 }

@@ -1,7 +1,7 @@
 package com.example.weathermaster.di
 
 import android.content.Context
-import com.example.weathermaster.geolocation.LocationManager
+import com.example.weathermaster.connectreceiver.ConnectReceiver
 import com.example.weathermaster.settings.AppSettings
 import dagger.Module
 import dagger.Provides
@@ -12,16 +12,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LocationModule {
+object ConnectModule {
 
     @Singleton
     @Provides
-    fun provideLocationManager(
+    fun provideConnectReceiver(
         appSettings: AppSettings,
         @ApplicationContext applicationContext: Context,
-    ): LocationManager {
-        return LocationManager(appSettings, applicationContext)
+    ): ConnectReceiver {
+        return ConnectReceiver(appSettings, applicationContext)
     }
-
 
 }

@@ -21,7 +21,6 @@ interface ApiService {
     suspend fun getWeather(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("units") units: String,
         @Query("lang") land: String,
         @Query("appid") apiKey: String
     ): Current
@@ -30,7 +29,6 @@ interface ApiService {
     suspend fun getForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("units") units: String,
         @Query("lang") land: String,
         @Query("appid") apiKey: String
     ): Forecast

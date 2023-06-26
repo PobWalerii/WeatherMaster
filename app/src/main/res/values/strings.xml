@@ -11,6 +11,8 @@
     <string name="temperature_Kelvin">temperature in Kelvin</string>
     <string name="settings_is_saved">Settings Saved</string>
     <string name="empty_search">No results found for your search</string>
+    <string name="city_already">This city is already listed</string>
+    <string name="text_no_internet">There Is No Internet. It Needs a Connection to Work.</string>
 
     <string name="permission">To ensure proper app functionality, permission to access location is required.</string>
 

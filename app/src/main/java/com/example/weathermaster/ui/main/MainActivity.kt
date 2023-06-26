@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.findNavController
 import com.example.weathermaster.R
+import com.example.weathermaster.connectreceiver.ConnectReceiver
 import com.example.weathermaster.data.repository.Repository
 import com.example.weathermaster.geolocation.LocationManager
 import com.example.weathermaster.settings.AppSettings
@@ -19,13 +20,15 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var locationManager: LocationManager
     @Inject
+    lateinit var connectReceiver: ConnectReceiver
+    @Inject
     lateinit var repository: Repository
     override fun onCreate(savedInstanceState: Bundle?) {
         startSplash(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         appSettings.init()
-        locationManager.init(this)
+
         repository.init()
     }
 
@@ -35,11 +38,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        startSplash(this)
+        //startSplash(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        connectReceiver.init()
+        locationManager.init(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        connectReceiver.close()
         appSettings.close()
     }
 

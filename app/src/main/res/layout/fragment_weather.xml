@@ -9,16 +9,10 @@
         <import type="android.view.View" />
         <variable
             name="city"
-            type="String" />
-        <variable
-            name="currentWeather"
-            type="com.example.weathermaster.data.apiservice.result.CurrentWeather" />
-        <variable
-            name="simbolTemp"
-            type="String" />
+            type="com.example.weathermaster.data.database.entity.CityAndWeatherFormated" />
         <variable
             name="forecast"
-            type="com.example.weathermaster.data.apiservice.result.CurrentForecast" />
+            type="com.example.weathermaster.data.database.entity.ForecastWeatherDay" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_title_top"
-            android:text="@{city}"
+            android:text="@{city.cityName}"
             android:textColor="@color/white"
             android:textSize="@dimen/title_size"
             app:layout_constraintEnd_toStartOf="@+id/settings"
@@ -53,13 +47,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{currentWeather.temp}"
+                android:text="@{city.temp}"
                 android:textColor="@color/white"
                 android:textSize="@dimen/current_temp_size" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{simbolTemp}"
+                android:text="@{city.tempSimbol}"
                 android:textColor="@color/white"
                 android:textSize="@dimen/current_simbol_size"/>
         </LinearLayout>
@@ -68,7 +62,7 @@
             android:id="@+id/weather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{currentWeather.description != null ? currentWeather.description + "  " + (forecast != null ? forecast.temp : ""): ""}'
+            android:text='@{city.description != null ? city.description + "  " + (forecast != null ? forecast.temp : ""): ""}'
             android:textColor="@color/white"
             android:textSize="@dimen/current_info_size"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +73,7 @@
             android:id="@+id/weather_icon"
             android:layout_width="@dimen/current_ico_size"
             android:layout_height="wrap_content"
-            app:showIcon="@{currentWeather.icon}"
+            app:showIcon="@{city.icon}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather"
@@ -91,10 +85,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/other_margin_top"
             android:gravity="center_horizontal|fill_vertical"
-            android:text='@{"Pressure "+currentWeather.pressure + "\nHumidity " + currentWeather.humidity + "\nWind: Speed "+ currentWeather.windSpeed+", Gust " + currentWeather.windGust}'
+            android:text='@{city.weather}'
             android:textColor="@color/white"
             android:textSize="@dimen/current_content_size"
-            android:visibility="@{currentWeather == null ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather_icon" />

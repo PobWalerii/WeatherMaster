@@ -7,15 +7,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.weathermaster.R
+import com.example.weathermaster.settings.AppSettings
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class LocationManager @Inject constructor(
+    private val appSettings: AppSettings,
     private val context: Context,
 ) {
 
@@ -24,27 +25,17 @@ class LocationManager @Inject constructor(
     fun init(activity: Activity) {
         val permissionGranted = requestLocationPermission(activity)
         if (permissionGranted) {
-            //if(!isRemoteService.value) {
+            appSettings.setIsPermissionStatus(true)
             startService()
-            //}
         }
     }
 
-    private fun stopService() {
-        //if(isRemoteService.value) {
-        context.stopService(serviceIntent)
-        //}
-    }
-
     private fun startService() {
-
-        //if(!isRemoteService.value) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(serviceIntent)
-            } else {
-                    context.startService(serviceIntent)
-            }
-        //}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent)
+        } else {
+            context.startService(serviceIntent)
+        }
     }
 
     @SuppressLint("ObsoleteSdkInt")

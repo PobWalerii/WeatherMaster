@@ -7,15 +7,19 @@ import android.os.IBinder
 import android.os.Looper
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
+import com.example.weathermaster.utils.KeyConstants.CHECK_LOCATION_DISTANCE
+import com.example.weathermaster.utils.KeyConstants.CHECK_LOCATION_TIME_INTERVAL
 import com.example.weathermaster.utils.KeyConstants.NOTIFICATION_ID
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @AndroidEntryPoint
 @Singleton
-class LocationService(): Service() {
+class LocationService: Service() {
 
     @Inject
     lateinit var appSettings: AppSettings
@@ -27,8 +31,7 @@ class LocationService(): Service() {
     private lateinit var timeLocationRequest: LocationRequest
     private lateinit var distanceLocationRequest: LocationRequest
     private var startedLocationTracking = false
-    private var timeInterval: Long = 3600000
-    private var minimalDistance: Float = 10000F
+    private var currentDate = "0000-00-00"
 
     private val timeLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -44,11 +47,17 @@ class LocationService(): Service() {
         for (location in locationResult.locations) {
             appSettings.setLocation(location.latitude, location.longitude)
         }
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = dateFormat.format(Date())
+        if(date != currentDate) {
+            currentDate = date
+            appSettings.setRefreshForecast(true)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val notification = notificationManager.setNotification()
+        val notification = notificationManager.setNotification("","Background Service")
         startForeground(NOTIFICATION_ID, notification)
 
         createLocationRequest()
@@ -56,23 +65,6 @@ class LocationService(): Service() {
         startLocationTracking()
 
         return START_STICKY
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        //appSettings.setIsBackService(true)
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        //stopForeground(STOP_FOREGROUND_REMOVE)
-        //stopSelf()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //stopForeground(STOP_FOREGROUND_REMOVE)
-        //appSettings.setIsBackService(false)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -96,23 +88,16 @@ class LocationService(): Service() {
         }
     }
 
-    fun stopLocationTracking() {
-        if (startedLocationTracking) {
-            timeLocationClient.removeLocationUpdates(timeLocationCallback)
-            distanceLocationClient.removeLocationUpdates(distanceLocationCallback)
-        }
-    }
-
     private fun setupLocationProviderClient() {
         timeLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
         distanceLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
     }
     private fun createLocationRequest() {
         timeLocationRequest =
-            LocationRequest.Builder(timeInterval).build()
+            LocationRequest.Builder(CHECK_LOCATION_TIME_INTERVAL*3600L).build()
         distanceLocationRequest =
             LocationRequest.Builder(0)
-            .setMinUpdateDistanceMeters(minimalDistance)
+            .setMinUpdateDistanceMeters(CHECK_LOCATION_DISTANCE)
             .build()
     }
 

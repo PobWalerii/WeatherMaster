@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
 import com.example.weathermaster.utils.KeyConstants.IMAGE_EXTENSION
 import com.example.weathermaster.utils.KeyConstants.IMAGE_URL
 
@@ -19,9 +20,4 @@ object BindingAdapter {
         }
     }
 
-    @JvmStatic
-    @BindingAdapter("toString")
-    fun toString(view: TextView, value: Double) {
-        view.text = value.toString()
-    }
 }

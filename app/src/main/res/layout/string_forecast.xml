@@ -5,7 +5,7 @@
     <data>
         <variable
             name="forecast"
-            type="com.example.weathermaster.data.apiservice.result.CurrentForecast" />
+            type="com.example.weathermaster.data.database.entity.ForecastWeatherDay" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

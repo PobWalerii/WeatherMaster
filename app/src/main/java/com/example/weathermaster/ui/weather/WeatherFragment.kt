@@ -8,10 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.weathermaster.R
 import com.example.weathermaster.databinding.FragmentWeatherBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -21,10 +19,6 @@ class WeatherFragment : Fragment() {
     private val binding get() = requireNotNull(_binding)
 
     private val viewModel by viewModels<WeatherViewModel>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,13 +30,45 @@ class WeatherFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeCityName()
-        observeCurrentWeather()
-        observeCurrentForecast()
+        //observeCityName()
+        //observeCurrentWeather()
+        observeCurrentData()
+        observeForecastData()
+        //observeCurrentForecast()
         setupSettingsClickListener()
         setupCityButtonClickListener()
     }
 
+    private fun observeCurrentData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.listCityAndWeather.collect {
+                binding.city = it[0]
+                viewModel.currentId = it[0].id
+            }
+        }
+    }
+
+    private fun observeForecastData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.listCityForecastDay.collect { list ->
+                //withContext(Dispatchers.Main){
+                //    Toast.makeText(context,"${list.size}",Toast.LENGTH_LONG).show()
+                //}
+
+                val forecast = list.filter { it.idCity == viewModel.currentId }
+                if(forecast.isNotEmpty()) {
+                    binding.forecast = forecast[0]
+                    binding.line1.forecast = forecast[1]
+                    binding.line2.forecast = forecast[2]
+                    binding.line3.forecast = forecast[3]
+                }
+            }
+        }
+    }
+
+
+
+/*
     private fun observeCityName() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.myCity.collect {
@@ -62,6 +88,14 @@ class WeatherFragment : Fragment() {
         }
     }
 
+ */
+
+
+
+
+
+
+/*
     private fun observeCurrentForecast() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentForecast.collect {
@@ -74,6 +108,8 @@ class WeatherFragment : Fragment() {
             }
         }
     }
+
+ */
 
     private fun setupSettingsClickListener() {
         binding.settings.setOnClickListener {

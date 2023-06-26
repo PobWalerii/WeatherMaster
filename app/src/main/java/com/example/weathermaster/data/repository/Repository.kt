@@ -1,36 +1,27 @@
 package com.example.weathermaster.data.repository
 
 import android.content.Context
-import android.os.Build
 import android.widget.Toast
-import androidx.room.Query
+import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.*
-import com.example.weathermaster.data.apiservice.result.CurrentForecast
-import com.example.weathermaster.data.apiservice.result.CurrentWeather
 import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
+import com.example.weathermaster.data.database.entity.*
 import com.example.weathermaster.data.database.entity.City
+import com.example.weathermaster.data.mapers.Mapers.forecastResponseToForecastWeather
+import com.example.weathermaster.data.mapers.Mapers.forecastToForecastWeatherDay
 import com.example.weathermaster.data.mapers.Mapers.getCityFromResponse
 import com.example.weathermaster.data.mapers.Mapers.toCityList
+import com.example.weathermaster.data.mapers.Mapers.weaterResponseToCurrentWeather
+import com.example.weathermaster.data.mapers.Mapers.weaterToWeaterFormated
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.API_KEY
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT1
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT2
-import com.example.weathermaster.utils.KeyConstants.MEASUREMENT3
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.roundToLong
 
 //https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&lang=ru&units=metric&appid=c5eb6539a8f80affa5ce841f35d42a90
 //https://openweathermap.org/current
@@ -44,33 +35,35 @@ class Repository @Inject constructor(
     private val applicationContext: Context,
 ) {
 
-    private val _tempSimbol = MutableStateFlow("K")
-    val tempSimbol: StateFlow<String> = _tempSimbol.asStateFlow()
-    private val _pressureSimbol = MutableStateFlow(" hPa")
-    val pressureSimbol: StateFlow<String> = _pressureSimbol.asStateFlow()
-    private val _speedSimbol = MutableStateFlow("m/s")
-    val speedSimbol: StateFlow<String> = _speedSimbol.asStateFlow()
-    private val _humiditySimbol = MutableStateFlow(" %")
-    val humiditySimbol: StateFlow<String> = _humiditySimbol.asStateFlow()
-
+    private val measurement: StateFlow<Int> = appSettings.measurement
     private val latitude: StateFlow<Double> = appSettings.latitude
     private val longitude: StateFlow<Double> = appSettings.longitude
-    private val currentRefresh: StateFlow<Boolean> = appSettings.currentRefresh
+
     private val checkCity: StateFlow<Boolean> = appSettings.checkCity
+
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
-    private val measurement: StateFlow<Int> = appSettings.measurement
+    private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
+    private val isPermissionStatus: StateFlow<Boolean> = appSettings.isPermissionStatus
 
-    private var respLatitude: Double = 0.0
-    private var respLongitude: Double = 0.0
+    private val isNotification: StateFlow<Boolean> = notificationManager.isNotification
 
-    private val _myCity = MutableStateFlow("")
-    val myCity: StateFlow<String> = _myCity.asStateFlow()
+    val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
+        .map { list ->
+            list.map {
+                weaterToWeaterFormated(it, measurement.value)
+            }
+        }
 
-    private val _currentWeather = MutableStateFlow<CurrentWeather?>(null)
-    val currentWeather: StateFlow<CurrentWeather?> = _currentWeather
+    val listCityForecastDay: Flow<List<ForecastWeatherDay>> = weatherDao.getForecastList()
+        .map { list ->
+            forecastToForecastWeatherDay(list, measurement.value)
+        }
 
-    private val _currentForecast = MutableStateFlow<List<CurrentForecast>?>(null)
-    val currentForecast: StateFlow<List<CurrentForecast>?> = _currentForecast
+    private val _necessaryLoadCurrent = MutableStateFlow(false)
+    private val necessaryLoadCurrent: StateFlow<Boolean> = _necessaryLoadCurrent
+
+    private val _necessaryLoadAll = MutableStateFlow(false)
+    private val necessaryLoadAll: StateFlow<Boolean> = _necessaryLoadAll
 
     private val _isLoadData = MutableStateFlow(false)
     val isLoadData: StateFlow<Boolean> = _isLoadData.asStateFlow()
@@ -81,264 +74,141 @@ class Repository @Inject constructor(
     private val _addCityResult = MutableStateFlow(false)
     val addCityResult: StateFlow<Boolean> = _addCityResult
 
+    private val _cityAddId = MutableStateFlow(0L)
+    val cityAddId: StateFlow<Long> = _cityAddId
+
     fun init() {
-        observeCheckCity()
-        observeCurrent()
-        observeMeasurement()
+        showNotification()
+        observePermission()
+        reservationMyCity()
+        observeAddCity()
+    }
+
+
+    private fun showNotification() {
+        CoroutineScope(Dispatchers.Default).launch {
+            combine(listCityAndWeather, isNotification) { list, notifi ->
+                Pair(list, notifi)
+            }.collect { (list, notifi) ->
+                if (notifi && list.isNotEmpty()) {
+                    val current = list[0]
+                    if (current.number == 0) {
+                        notificationManager.updateNotificationContent(
+                            current.cityName,
+                            "${current.temp}${current.tempSimbol}  ${current.description}"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun observePermission() {
+        CoroutineScope(Dispatchers.Default).launch {
+            isPermissionStatus.collect {
+                if(it) {
+                    observeCheckCity()
+                }
+            }
+        }
     }
 
     private fun observeCheckCity() {
         CoroutineScope(Dispatchers.Default).launch {
-            checkCity.collect {
-                if(it) {
+            combine(
+                checkCity,
+                isConnectStatus,
+            ) { checkCity, isConnect ->
+                checkCity && isConnect
+            }.collect {
+                if (it) {
                     getCity()
                 }
             }
         }
     }
 
-    private fun observeCurrent() {
-        CoroutineScope(Dispatchers.Default).launch {
-            combine(checkCity,currentRefresh) {checkCity,currentRefresh -> Pair(checkCity,currentRefresh)}
-            .collect {(checkCity,currentRefresh) ->
-                if(!checkCity && currentRefresh) {
-                    getWeather()
-                    getForecast()
-                }
-            }
-        }
-    }
 
-    private fun observeMeasurement() {
-        CoroutineScope(Dispatchers.Default).launch {
-            measurement.collect {
-                _tempSimbol.value = listOf("K","\u2103","\u2109")[it-1]
-                _speedSimbol.value = listOf(" m/s"," m/s"," mph")[it-1]
-                if(myCity.value.isNotEmpty()) {
-                    getWeather()
-                }
-            }
-        }
-    }
 
-    private suspend fun getForecast() {
+    private suspend fun getForecast(city: City): Boolean {
         try {
             val response = apiService.getForecast(
-                respLatitude,
-                respLongitude,
-                when(measurement.value) {
-                    2 -> MEASUREMENT2
-                    3 -> MEASUREMENT3
-                    else -> MEASUREMENT1
-                },
+                city.latitude,
+                city.longitude,
                 languageCode,
                 API_KEY
             )
-            //withContext(Dispatchers.Main) {
-            //    val list = response.listData.size
-            //    Toast.makeText(applicationContext, "$list", Toast.LENGTH_LONG).show()
-            //}
-            getForecastValues(response)
-            //_currentForecast.value = forecast
+            val forecast: List<ForecastWeather> = forecastResponseToForecastWeather(response, city.id)
+            weatherDao.updateForecast(forecast)
+            return true
         } catch  (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
+            return false
         }
-
-
     }
 
-    private suspend fun getWeather() {
+    private suspend fun getWeatherAll() {
+        weatherDao.loadCityList().filter { it.number != 0 }.map {
+            getWeather(it)
+        }
+    }
+
+// Запрос текущей погоды
+    private suspend fun getWeather(city: City): Boolean {
         try {
-            val response = apiService.getWeather(
-                respLatitude,
-                respLongitude,
-                when(measurement.value) {
-                    2 -> MEASUREMENT2
-                    3 -> MEASUREMENT3
-                    else -> MEASUREMENT1
-                },
+            val response: Current = apiService.getWeather(
+                city.latitude,
+                city.longitude,
                 languageCode,
                 API_KEY
             )
-            val current: CurrentWeather = getCurrentValues(response)
-            _currentWeather.value = current
+            val current: CurrentWeather = weaterResponseToCurrentWeather(response, city.id)
+            weatherDao.insertCurrentWeather(current)
+            return true
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
-        } finally {
-            appSettings.setCurrentRefresh()
+            return false
         }
     }
-    //https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&units=metric&lang=ru&appid=c5eb6539a8f80affa5ce841f35d42a90
-
-    private fun getForecastValues(response: Forecast) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val featureList: MutableList<CurrentForecast> = mutableListOf()
-            val listData = response.listData
-        var startDate = "0000-00-00"
-        var minTemp = 0.0
-        var maxTemp = 0.0
-        val descriptionCounts = mutableMapOf<String, Int>()
-        val iconCounts = mutableMapOf<String, Int>()
-        listData.forEach {
-            val main = it.main  // температура, давление, влажность
-            val weat = it.weather[0]  // описание, иконка
-            val dt = it.dtTxt
-            val stringDate = dt.substring(0,10)
-            if (stringDate != startDate) {
-                if (startDate != "0000-00-00") {
-                    var maxCount = 0
-                    var dominantDescription = ""
-                    for ((description, count) in descriptionCounts) {
-                        if (count > maxCount) {
-                            dominantDescription = description
-                            maxCount = count
-                        }
-                    }
-                    maxCount = 0
-                    var dominantIcon = ""
-                    for ((icon, count) in iconCounts) {
-                        if (count > maxCount) {
-                            dominantIcon = icon
-                            maxCount = count
-                        }
-                    }
-                    val index = featureList.size
-                    featureList.add(
-                        index,
-                        CurrentForecast(
-                            startDate,
-                            getDn(startDate).replaceFirstChar { it.uppercase() },
-                            ((minTemp * 10.0).roundToLong() / 10.0).toString() + " / " +
-                                    ((maxTemp * 10.0).roundToLong() / 10.0).toString() + tempSimbol.value,
-                            dominantDescription.replaceFirstChar { it.uppercase() },
-                            dominantIcon
-                        )
-                    )
-                }
-                minTemp = main.temp
-                maxTemp = main.temp
-                startDate = stringDate
-                descriptionCounts.clear()
-                iconCounts.clear()
-            } else {
-                if(main.temp<minTemp) minTemp = main.temp
-                if(main.temp>maxTemp) maxTemp = main.temp
-                var counts = iconCounts.getOrDefault(weat.icon, 0)
-                iconCounts[weat.icon] = counts + 1
-                counts = descriptionCounts.getOrDefault(weat.description, 0)
-                descriptionCounts[weat.description] = counts + 1
-            }
-        }
-        _currentForecast.value = featureList
-         }
-    }
-
-    private fun getDn(startDate: String): String {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val localDate = LocalDate.parse(startDate)
-            val dayOfWeek = localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-            return dayOfWeek
-        } else {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val date = dateFormat.parse(startDate)
-            val calendar = Calendar.getInstance()
-            calendar.time = date!!
-            val displayName = SimpleDateFormat("EEE", Locale.getDefault()).format(calendar.time)
-            return displayName
-        }
-    }
-
-    private fun getCurrentValues(response: Current): CurrentWeather {
-        val main = response.main
-        val weat = response.weather[0]
-        val wind = response.wind
-        val current =  CurrentWeather(
-            ((main.temp * 10.0).roundToLong() /10.0).toString(),
-            weat.description.replaceFirstChar { it.uppercase() },
-            weat.icon,
-            main.pressure.toString()+pressureSimbol.value,
-            main.humidity.toString()+humiditySimbol.value,
-            ((wind.speed * 10.0).roundToLong() /10.0).toString()+speedSimbol.value,
-            ((wind.gust * 10.0).roundToLong() /10.0).toString()+speedSimbol.value
-        )
-        notificationManager.updateNotificationContent(
-            icon = current.icon,
-            title = myCity.value,
-            content = "${current.temp}${tempSimbol.value}  ${current.description}"
-        )
-        return current
-    }
-
-
-
-
-
-
 
 
 
     private suspend fun getCity() {
         try {
             val city: SearchListItem? = getCityFromLocation(latitude.value, longitude.value)
-
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    applicationContext,
-                    "${latitude.value} - ${city?.latitude}, ${latitude.value} - ${city?.longitude}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-            if(city != null) {
-                val cityInBaseList: List<City> =
-                    weatherDao.getCityByLocation(city.latitude, city.longitude)
-                val cityId = if (cityInBaseList.size == 0) {
-                    weatherDao.insertCity(
-                        City(
-                            0,
-                            0,
-                            city.cityName,
-                            city.latitude,
-                            city.longitude,
-                            city.country,
-                            city.countryName,
-                            city.state
-                        )
-                    )
-                } else {
-                    cityInBaseList[0].id
-                }
-                val cityList = weatherDao.loadCityList()
-                var number = 0
-                cityList.map {
-                    if (it.id == cityId) {
-                        if (it.number != 0) {
-                            weatherDao.updateCityNumber(it.id, 0)
-                        }
-                    } else {
-                        number++
-                        if (it.number != number) {
-                            weatherDao.updateCityNumber(it.id, number)
-                        }
+            if (city != null) {
+                val currentCity = City(
+                    1,
+                    0,
+                    city.cityName,
+                    city.latitude,
+                    city.longitude,
+                    city.country,
+                    city.countryName,
+                    city.state
+                )
+                weatherDao.insertCity( currentCity )
+                if ( getWeather(currentCity) ) {
+                    if( !getForecast(currentCity) ) {
+                        _necessaryLoadCurrent.value = true
                     }
+                } else {
+                    _necessaryLoadCurrent.value = true
                 }
-                _myCity.value = city.cityName
-                respLatitude = city.latitude
-                respLongitude = city.longitude
+                appSettings.setCheckCity()
             }
-
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
-        } finally {
-            appSettings.setCheckCity()
         }
     }
+
 
     fun getSearchList(keyWord: String) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -371,16 +241,9 @@ class Repository @Inject constructor(
     fun addCity(current: SearchListItem) {
         CoroutineScope(Dispatchers.IO).launch {
             val city: SearchListItem? = getCityFromLocation(current.latitude, current.longitude)
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    applicationContext,
-                    "${respLatitude} - ${city?.latitude}, ${respLongitude} - ${city?.longitude}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
             if(city != null) {
-                if (weatherDao.getCityByLocation(city.latitude, city.longitude).size == 0) {
+                val currentCity = weatherDao.getCityByLocation(city.latitude, city.longitude)
+                if (currentCity.isEmpty()) {
                     val cityList = weatherDao.loadCityList()
                     val listSize = cityList.size
                     val number =
@@ -389,7 +252,7 @@ class Repository @Inject constructor(
                         } else {
                             cityList[listSize - 1].number + 1
                         }
-                    weatherDao.insertCity(
+                    val cityId =weatherDao.insertCity(
                         City(
                             0,
                             number,
@@ -401,12 +264,12 @@ class Repository @Inject constructor(
                             city.state
                         )
                     )
-                    _addCityResult.value = true
+                    _cityAddId.value = cityId
                 } else {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             applicationContext,
-                            "Такой город уже внесен в список",
+                            applicationContext.getString(R.string.city_already)+" - ${currentCity[0].number}",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -414,6 +277,40 @@ class Repository @Inject constructor(
             }
         }
     }
+
+    private fun observeAddCity() {
+        CoroutineScope(Dispatchers.Default).launch {
+            cityAddId.collect {
+                if(it != 0L) {
+                    _cityAddId.value = 0L
+                    val city = weatherDao.getCityById(it)
+                    if(city.id != 0L) {
+                        if( getWeather(city) ) {
+                            if( !getForecast(city) ) {
+                                _necessaryLoadAll.value = true
+                            }
+                        } else {
+                            _necessaryLoadAll.value = true
+                        }
+                        _addCityResult.value = true
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private suspend fun getCityFromLocation(latitude: Double, longitude: Double): SearchListItem? {
         try {
@@ -432,7 +329,43 @@ class Repository @Inject constructor(
         }
     }
 
+    private fun reservationMyCity() {
+        CoroutineScope(Dispatchers.Default).launch {
+            val cityList = loadCityList()
+            if( cityList.size==0 ) {
+                weatherDao.insertCity(
+                    City(
+                        1,
+                        0,
+                        applicationContext.getString(R.string.my_city),
+                        0.0,
+                        0.0,
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            }
+        }
+    }
+
     suspend fun loadCityList() = weatherDao.loadCityList()
+
+    fun deleteCity(city: CityAndWeatherFormated) {
+        CoroutineScope(Dispatchers.IO).launch {
+            weatherDao.deleteById(city.id)
+        }
+    }
+
+    fun updateCityList(list: List<CityAndWeatherFormated>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var number = 1
+            list.map {
+                weatherDao.updateCityNumber(it.id, number)
+                number++
+            }
+        }
+    }
 
 
 }

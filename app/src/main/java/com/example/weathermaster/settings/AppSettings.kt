@@ -5,9 +5,12 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.weathermaster.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Singleton
 
@@ -19,14 +22,30 @@ class AppSettings(
     private val _measurement = MutableStateFlow(0)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
 
+
+    //private val _tempSimbol = MutableStateFlow("K")
+    //val tempSimbol: StateFlow<String> = _tempSimbol.asStateFlow()
+    //private val _pressureSimbol = MutableStateFlow(" hPa")
+    //val pressureSimbol: StateFlow<String> = _pressureSimbol.asStateFlow()
+    //private val _speedSimbol = MutableStateFlow("m/s")
+    //val speedSimbol: StateFlow<String> = _speedSimbol.asStateFlow()
+    //private val _humiditySimbol = MutableStateFlow(" %")
+    //val humiditySimbol: StateFlow<String> = _humiditySimbol.asStateFlow()
+
+
+
+
     private val _latitude = MutableStateFlow(0.0)
     val latitude: StateFlow<Double> = _latitude.asStateFlow()
 
     private val _longitude = MutableStateFlow(0.0)
     val longitude: StateFlow<Double> = _longitude.asStateFlow()
 
-    private val _currentRefresh = MutableStateFlow(false)
-    val currentRefresh: StateFlow<Boolean> = _currentRefresh.asStateFlow()
+    private val _necessaryRefreshForecast = MutableStateFlow(false)
+    private val necessaryRefreshForecast: StateFlow<Boolean> = _necessaryRefreshForecast
+
+    //private val _currentRefresh = MutableStateFlow(false)
+    //val currentRefresh: StateFlow<Boolean> = _currentRefresh.asStateFlow()
 
     private val _checkCity = MutableStateFlow(false)
     val checkCity: StateFlow<Boolean> = _checkCity.asStateFlow()
@@ -35,14 +54,19 @@ class AppSettings(
         _latitude.value = latitude
         _longitude.value = longitude
         _checkCity.value = true
-        _currentRefresh.value = true
+        //_currentRefresh.value = true
     }
-    fun setCurrentRefresh() {
-        _currentRefresh.value = false
-    }
+    //fun setCurrentRefresh() {
+    //    _currentRefresh.value = false
+    //}
     fun setCheckCity() {
         _checkCity.value = false
     }
+
+    fun setRefreshForecast(value: Boolean) {
+        _necessaryRefreshForecast.value = value
+    }
+
 
     //private val _firstLoad = MutableStateFlow(true)
     //val firstLoad: StateFlow<Boolean> = _firstLoad.asStateFlow()
@@ -53,8 +77,11 @@ class AppSettings(
     //private val _isRemoteService = MutableStateFlow(false)
     //val isRemoteService: StateFlow<Boolean> = _isRemoteService.asStateFlow()
 
-    //private val _isConnectStatus = MutableStateFlow(true)
-    //val isConnectStatus: StateFlow<Boolean> = _isConnectStatus.asStateFlow()
+    private val _isConnectStatus = MutableStateFlow(true)
+    val isConnectStatus: StateFlow<Boolean> = _isConnectStatus.asStateFlow()
+
+    private val _isPermissionStatus = MutableStateFlow(false)
+    val isPermissionStatus: StateFlow<Boolean> = _isPermissionStatus.asStateFlow()
 
     //private val _isDateChanged = MutableStateFlow(false)
     //val isDateChanged: StateFlow<Boolean> = _isDateChanged.asStateFlow()
@@ -116,6 +143,7 @@ class AppSettings(
         //setFirstLoad(true)
     }
 
+
     //fun setFirstLoad(isStart: Boolean = false) {
         //_firstLoad.value = isStart
     //}
@@ -141,9 +169,13 @@ class AppSettings(
     //    _isRemoteService.value = state
     //}
 
-   // fun setIsConnectStatus(state: Boolean) {
-   //     _isConnectStatus.value = state
-    //}
+    fun setIsConnectStatus(state: Boolean) {
+        _isConnectStatus.value = state
+    }
+
+    fun setIsPermissionStatus(state: Boolean) {
+        _isPermissionStatus.value = state
+    }
 
     //fun setIsDateChanged(state: Boolean) {
     //    _isDateChanged.value = state

@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="item"
-            type="com.example.weathermaster.data.database.entity.City" />
+            type="com.example.weathermaster.data.database.entity.CityAndWeatherFormated" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/forecast_back"
-        android:layout_marginBottom="@dimen/search_item_margin_bottom">
+        android:layout_marginBottom="@dimen/item_city_margin"
+        android:padding="@dimen/item_city_margin"
+        android:background="@drawable/forecast_back">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -21,7 +25,7 @@
             android:layout_weight="1"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/weather"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -30,39 +34,48 @@
                 android:layout_height="wrap_content"
                 android:text="@{item.cityName}"
                 android:textColor="@color/black"
-                android:textSize="@dimen/search_item_name_size"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:toString="@{item.latitude}"
-                android:textColor="@color/black"
-                android:textSize="@dimen/search_item_name_size"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:toString="@{item.longitude}"
-                android:textColor="@color/black"
-                android:textSize="@dimen/search_item_name_size"/>
+                android:textSize="@dimen/item_title_size"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text='@{(item.country + "  " + item.countryName).trim()}'
                 android:textColor="@color/light_black"
-                android:textSize="@dimen/search_item_info_size" />
+                android:textSize="@dimen/item_info_size" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text='@{item.state}'
                 android:textColor="@color/light_black"
-                android:textSize="@dimen/search_item_info_size"
+                android:textSize="@dimen/item_info_size"
                 android:visibility="@{item.state.isEmpty ? View.GONE : View.VISIBLE}" />
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseCompoundDrawables">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{item.temp+item.tempSimbol}"
+                android:textSize="@dimen/item_info_size" />
+
+            <ImageView
+                android:layout_width="@dimen/forecast_ico_size"
+                android:layout_height="wrap_content"
+                app:showIcon="@{item.icon}"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -8,6 +8,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.weathermaster.R
 import com.example.weathermaster.utils.KeyConstants.IMAGE_EXTENSION
@@ -17,14 +18,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @SuppressLint("ServiceCast")
 @Singleton
 class NotificationManager @Inject constructor(
     private val context: Context
 ) {
+
+    private val _isNotification = MutableStateFlow(false)
+    val isNotification: StateFlow<Boolean> = _isNotification.asStateFlow()
 
     private val notificationManager: NotificationManager by lazy {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -46,57 +55,27 @@ class NotificationManager @Inject constructor(
         }
     }
 
-    fun setNotification(): Notification {
+    fun setNotification(title: String = "", content: String = ""): Notification {
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.small)
-            //.setContentTitle("")
-            //.setContentText("")
-
-        val notification = notificationBuilder.build()
-        return notification
+            .setContentTitle(title)
+            .setContentText(content)
+        _isNotification.value = true
+        return notificationBuilder.build()
     }
 
-    fun updateNotificationContent(icon: String = "", title: String = "", content: String = "") {
-        var image: Bitmap? = null
-        loadImageFromUrl(IMAGE_URL + icon + IMAGE_EXTENSION) {
-            bitmap ->  image = bitmap
-        }
 
+    fun updateNotificationContent(title: String, content: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(context, title + "  " + content, Toast.LENGTH_SHORT).show()
+        }
+        notificationManager.cancel(NOTIFICATION_ID)
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.small)
-
-        if(image != null) {
-            notificationBuilder.setLargeIcon(image)
-        }
-
-        if(title.isNotEmpty()) {
-            notificationBuilder.setContentTitle(title)
-        }
-        if(content.isNotEmpty()) {
-            notificationBuilder.setContentText(content)
-        }
+            .setContentTitle(title)
+            .setContentText(content)
         val updatedNotification = notificationBuilder.build()
         notificationManager.notify(NOTIFICATION_ID, updatedNotification)
     }
-
-    fun loadImageFromUrl(imageUrl: String, callback: (Bitmap?) -> Unit) {
-        Glide.with(context)
-            .asBitmap()
-            .load(imageUrl)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    callback(resource)
-                }
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    callback(null)
-                }
-                override fun onLoadCleared(placeholder: Drawable?) {
-                }
-            })
-    }
-
-
-
-
 
 }
