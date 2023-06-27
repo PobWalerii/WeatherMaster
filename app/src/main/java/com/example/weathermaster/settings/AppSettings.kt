@@ -5,13 +5,9 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.weathermaster.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Singleton
 
 @Singleton
@@ -21,19 +17,6 @@ class AppSettings(
 
     private val _measurement = MutableStateFlow(0)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
-
-
-    //private val _tempSimbol = MutableStateFlow("K")
-    //val tempSimbol: StateFlow<String> = _tempSimbol.asStateFlow()
-    //private val _pressureSimbol = MutableStateFlow(" hPa")
-    //val pressureSimbol: StateFlow<String> = _pressureSimbol.asStateFlow()
-    //private val _speedSimbol = MutableStateFlow("m/s")
-    //val speedSimbol: StateFlow<String> = _speedSimbol.asStateFlow()
-    //private val _humiditySimbol = MutableStateFlow(" %")
-    //val humiditySimbol: StateFlow<String> = _humiditySimbol.asStateFlow()
-
-
-
 
     private val _latitude = MutableStateFlow(0.0)
     val latitude: StateFlow<Double> = _latitude.asStateFlow()
@@ -77,7 +60,7 @@ class AppSettings(
     //private val _isRemoteService = MutableStateFlow(false)
     //val isRemoteService: StateFlow<Boolean> = _isRemoteService.asStateFlow()
 
-    private val _isConnectStatus = MutableStateFlow(true)
+    private val _isConnectStatus = MutableStateFlow(false)
     val isConnectStatus: StateFlow<Boolean> = _isConnectStatus.asStateFlow()
 
     private val _isPermissionStatus = MutableStateFlow(false)

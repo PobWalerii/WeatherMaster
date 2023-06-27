@@ -36,7 +36,6 @@ interface WeatherDao {
     @Query("DELETE FROM CurrentWeather WHERE idCity = :curId")
     suspend fun deleteWeather(curId: Long)
 
-
     @Query("SELECT T1.*, T2.* FROM City T1 LEFT JOIN CurrentWeather T2 ON T1.id = T2.idCity ORDER BY T1.number")
     fun getCityAndWeatherList(): Flow<List<CityAndWeather>>
 

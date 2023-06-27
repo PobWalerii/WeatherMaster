@@ -15,7 +15,6 @@ import com.example.weathermaster.data.mapers.Mapers.getCityFromResponse
 import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.data.mapers.Mapers.weaterResponseToCurrentWeather
 import com.example.weathermaster.data.mapers.Mapers.weaterToWeaterFormated
-import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.API_KEY
 import kotlinx.coroutines.*
@@ -23,15 +22,11 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-//https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&lang=ru&units=metric&appid=c5eb6539a8f80affa5ce841f35d42a90
-//https://openweathermap.org/current
-
 @Singleton
 class Repository @Inject constructor(
     private val weatherDao: WeatherDao,
     private val apiService: ApiService,
     private val appSettings: AppSettings,
-    private val notificationManager: NotificationManager,
     private val applicationContext: Context,
 ) {
 
@@ -44,8 +39,6 @@ class Repository @Inject constructor(
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
     private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
     private val isPermissionStatus: StateFlow<Boolean> = appSettings.isPermissionStatus
-
-    //private val isNotification: StateFlow<Boolean> = notificationManager.isNotification
 
     val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
         .map { list ->
@@ -75,53 +68,13 @@ class Repository @Inject constructor(
     val addCityResult: StateFlow<Boolean> = _addCityResult
 
     private val _cityAddId = MutableStateFlow(0L)
-    val cityAddId: StateFlow<Long> = _cityAddId
+    private val cityAddId: StateFlow<Long> = _cityAddId
 
     fun init() {
-        showNotification()
         observePermission()
         reservationMyCity()
         observeAddCity()
     }
-
-
-    private fun showNotification() {
-        CoroutineScope(Dispatchers.Default).launch {
-            listCityAndWeather.collect { list ->
-                if (list.isNotEmpty()) {
-                    val current = list[0]
-                    if (current.number == 0) {
-                        notificationManager.updateNotificationContent(
-                            current.cityName,
-                            "${current.temp}${current.tempSimbol}  ${current.description}"
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-/*
-    private fun showNotification() {
-        CoroutineScope(Dispatchers.Default).launch {
-            combine(listCityAndWeather, isNotification) { list, notifi ->
-                Pair(list, notifi)
-            }.collect { (list, notifi) ->
-                if (list.isNotEmpty()) {
-                    val current = list[0]
-                    if (current.number == 0) {
-                        notificationManager.updateNotificationContent(
-                            current.cityName,
-                            "${current.temp}${current.tempSimbol}  ${current.description}"
-                        )
-                    }
-                }
-            }
-        }
-    }
-
- */
-
 
     private fun observePermission() {
         CoroutineScope(Dispatchers.Default).launch {
@@ -139,16 +92,14 @@ class Repository @Inject constructor(
                 checkCity,
                 isConnectStatus,
             ) { checkCity, isConnect ->
-                checkCity && isConnect
-            }.collect {
-                if (it) {
+                Pair(checkCity, isConnect)
+            }.collect { (checkCity, isConnect) ->
+                if (checkCity && isConnect) {
                     getCity()
                 }
             }
         }
     }
-
-
 
     private suspend fun getForecast(city: City): Boolean {
         try {
@@ -175,7 +126,7 @@ class Repository @Inject constructor(
         }
     }
 
-// Запрос текущей погоды
+    // Запрос текущей погоды
     private suspend fun getWeather(city: City): Boolean {
         try {
             val response: Current = apiService.getWeather(
@@ -195,8 +146,6 @@ class Repository @Inject constructor(
         }
     }
 
-
-
     private suspend fun getCity() {
         try {
             val city: SearchListItem? = getCityFromLocation(latitude.value, longitude.value)
@@ -212,6 +161,7 @@ class Repository @Inject constructor(
                     city.state
                 )
                 weatherDao.insertCity( currentCity )
+                appSettings.setCheckCity()
                 if ( getWeather(currentCity) ) {
                     if( !getForecast(currentCity) ) {
                         _necessaryLoadCurrent.value = true
@@ -219,7 +169,7 @@ class Repository @Inject constructor(
                 } else {
                     _necessaryLoadCurrent.value = true
                 }
-                appSettings.setCheckCity()
+
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
@@ -318,40 +268,26 @@ class Repository @Inject constructor(
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     private suspend fun getCityFromLocation(latitude: Double, longitude: Double): SearchListItem? {
-        try {
+        return try {
             val response: LocationItem = apiService.getCity(
                 latitude,
                 longitude,
                 1, API_KEY
             )[0]
-            val city: SearchListItem = getCityFromResponse(response, languageCode)
-            return city
+            getCityFromResponse(response, languageCode)
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
             }
-            return null
+            null
         }
     }
 
     private fun reservationMyCity() {
         CoroutineScope(Dispatchers.Default).launch {
             val cityList = loadCityList()
-            if( cityList.size==0 ) {
+            if( cityList.isEmpty() ) {
                 weatherDao.insertCity(
                     City(
                         1,
@@ -368,7 +304,7 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun loadCityList() = weatherDao.loadCityList()
+    private suspend fun loadCityList() = weatherDao.loadCityList()
 
     fun deleteCity(city: CityAndWeatherFormated) {
         CoroutineScope(Dispatchers.IO).launch {

@@ -3,7 +3,6 @@ package com.example.weathermaster.data.apiservice
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
-import com.example.weathermaster.data.apiservice.response.Weather
 import retrofit2.http.GET
 import retrofit2.http.Query
 

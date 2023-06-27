@@ -6,8 +6,6 @@ import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.database.base.AppDatabase
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.repository.Repository
-import com.example.weathermaster.geolocation.LocationManager
-import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants
 import dagger.Module
@@ -42,13 +40,12 @@ object DatabaseModule {
         weatherDao: WeatherDao,
         apiService: ApiService,
         appSettings: AppSettings,
-        notificationManager: NotificationManager,
         @ApplicationContext applicationContext: Context,
     ): Repository {
         return Repository(weatherDao,
             apiService,
             appSettings,
-            notificationManager, applicationContext)
+            applicationContext)
     }
 
 }

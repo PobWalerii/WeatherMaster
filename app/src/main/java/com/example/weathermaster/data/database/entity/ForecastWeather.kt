@@ -1,7 +1,6 @@
 package com.example.weathermaster.data.database.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity(primaryKeys = ["idCity","date"])
 data class ForecastWeather(

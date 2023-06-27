@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val repository: Repository
+    repository: Repository
 ): ViewModel() {
 
     var currentId = 0L

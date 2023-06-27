@@ -28,17 +28,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         appSettings.init()
-
         repository.init()
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragmentContainerView).navigateUp() || super.onSupportNavigateUp()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        //startSplash(this)
     }
 
     override fun onResume() {

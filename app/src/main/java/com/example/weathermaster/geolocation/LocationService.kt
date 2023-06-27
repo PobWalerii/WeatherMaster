@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.os.Looper
+import android.widget.Toast
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants.CHECK_LOCATION_DISTANCE
@@ -12,6 +13,10 @@ import com.example.weathermaster.utils.KeyConstants.CHECK_LOCATION_TIME_INTERVAL
 import com.example.weathermaster.utils.KeyConstants.NOTIFICATION_ID
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -57,7 +62,7 @@ class LocationService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val notification = notificationManager.setNotification("","Background Service")
+        val notification = notificationManager.setNotification("","Foreground Service")
         startForeground(NOTIFICATION_ID, notification)
 
         createLocationRequest()
@@ -94,12 +99,11 @@ class LocationService: Service() {
     }
     private fun createLocationRequest() {
         timeLocationRequest =
-            LocationRequest.Builder(CHECK_LOCATION_TIME_INTERVAL*3600L).build()
+            LocationRequest.Builder(CHECK_LOCATION_TIME_INTERVAL*3600000L).build()
         distanceLocationRequest =
             LocationRequest.Builder(0)
             .setMinUpdateDistanceMeters(CHECK_LOCATION_DISTANCE)
             .build()
     }
-
 
 }
