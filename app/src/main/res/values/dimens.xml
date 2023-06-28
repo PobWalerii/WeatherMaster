@@ -39,14 +39,13 @@
     <dimen name="progress_size">70dp</dimen>
     <dimen name="recycler_margin_horizontal">15dp</dimen>
 
-
-
     <dimen name="search_item_name_size">18sp</dimen>
     <dimen name="search_item_info_size">16sp</dimen>
     <dimen name="search_item_plus_size">30dp</dimen>
     <dimen name="search_item_margin_bottom">10dp</dimen>
 
-
-
+    <dimen name="button_city_margin_bottom">30dp</dimen>
+    <dimen name="string_city_padding_vertical">10dp</dimen>
+    <dimen name="string_city_padding_horizontal">20dp</dimen>
 
 </resources>

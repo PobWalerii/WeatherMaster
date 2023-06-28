@@ -15,8 +15,11 @@ import com.example.weathermaster.data.mapers.Mapers.getCityFromResponse
 import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.data.mapers.Mapers.weaterResponseToCurrentWeather
 import com.example.weathermaster.data.mapers.Mapers.weaterToWeaterFormated
+import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
+import com.example.weathermaster.utils.KeyConstants
 import com.example.weathermaster.utils.KeyConstants.API_KEY
+import com.example.weathermaster.utils.LoadImage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -27,6 +30,7 @@ class Repository @Inject constructor(
     private val weatherDao: WeatherDao,
     private val apiService: ApiService,
     private val appSettings: AppSettings,
+    private val notificationManager: NotificationManager,
     private val applicationContext: Context,
 ) {
 
@@ -39,6 +43,7 @@ class Repository @Inject constructor(
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
     private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
     private val isPermissionStatus: StateFlow<Boolean> = appSettings.isPermissionStatus
+    private val isServiceStatus: StateFlow<Boolean> = appSettings.isServiceStatus
 
     val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
         .map { list ->
@@ -58,6 +63,9 @@ class Repository @Inject constructor(
     private val _necessaryLoadAll = MutableStateFlow(false)
     private val necessaryLoadAll: StateFlow<Boolean> = _necessaryLoadAll
 
+    private val _necessaryLoadWeatherAll = MutableStateFlow(false)
+    private val necessaryLoadWeatherAll: StateFlow<Boolean> = _necessaryLoadWeatherAll
+
     private val _isLoadData = MutableStateFlow(false)
     val isLoadData: StateFlow<Boolean> = _isLoadData.asStateFlow()
 
@@ -74,6 +82,21 @@ class Repository @Inject constructor(
         observePermission()
         reservationMyCity()
         observeAddCity()
+        showNotification()
+    }
+
+    private fun showNotification() {
+        CoroutineScope(Dispatchers.Default).launch {
+            combine( listCityAndWeather, isServiceStatus ) {
+                list, isService ->
+                Pair(list, isService)
+            }.collect {
+                (list, isService) ->
+                if(isService && list.isNotEmpty()) {
+                    notificationManager.updateNotificationContent(list[0])
+                }
+            }
+        }
     }
 
     private fun observePermission() {
@@ -122,7 +145,9 @@ class Repository @Inject constructor(
 
     private suspend fun getWeatherAll() {
         weatherDao.loadCityList().filter { it.number != 0 }.map {
-            getWeather(it)
+            if(!getWeather(it)) {
+                _necessaryLoadWeatherAll.value = true
+            }
         }
     }
 
@@ -165,6 +190,8 @@ class Repository @Inject constructor(
                 if ( getWeather(currentCity) ) {
                     if( !getForecast(currentCity) ) {
                         _necessaryLoadCurrent.value = true
+                    } else {
+                        getWeatherAll()
                     }
                 } else {
                     _necessaryLoadCurrent.value = true

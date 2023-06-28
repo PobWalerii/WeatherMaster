@@ -9,13 +9,16 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.databinding.FragmentWeatherBinding
 import com.example.weathermaster.notification.NotificationManager
+import com.example.weathermaster.ui.citylist.CityListAdapter
 import com.example.weathermaster.utils.KeyConstants
 import com.example.weathermaster.utils.LoadImage.loadImageFromUrl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,10 +29,10 @@ class WeatherFragment : Fragment() {
     private var _binding: FragmentWeatherBinding? = null
     private val binding get() = requireNotNull(_binding)
 
-    @Inject
-    lateinit var notificationManager: NotificationManager
-
     private val viewModel by viewModels<WeatherViewModel>()
+
+    private lateinit var adapter: CityStringAdapter
+    private lateinit var recycler: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +44,8 @@ class WeatherFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupAdapter()
+        setupRecycler()
         observeCurrentData()
         observeForecastData()
         setupSettingsClickListener()
@@ -49,31 +54,32 @@ class WeatherFragment : Fragment() {
 
     private fun observeCurrentData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.listCityAndWeather.collect { list ->
+            viewModel.listCityAndWeather.distinctUntilChanged().collect { list ->
                 val current = list[0]
                 binding.city = current
                 viewModel.currentId = current.id
-                if (current.number == 0) {
-                    delay(100)
-                    withContext(Dispatchers.Main) {
-                        val image = loadImageFromUrl(
-                            KeyConstants.IMAGE_URL + current.icon + KeyConstants.IMAGE_EXTENSION,
-                            requireContext()
-                        )
-                        notificationManager.updateNotificationContent(
-                            image,
-                            current.cityName,
-                            "${current.temp}${current.tempSimbol}  ${current.description}"
-                        )
-                    }
-                }
+
+                adapter.setList(list)
+
+
             }
         }
     }
 
+    private fun setupAdapter() {
+        adapter = CityStringAdapter()
+        adapter.setHasStableIds(true)
+    }
+
+    private fun setupRecycler() {
+        recycler = binding.recycler
+        recycler.adapter = adapter
+    }
+
+
     private fun observeForecastData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.listCityForecastDay.collect { list ->
+            viewModel.listCityForecastDay.distinctUntilChanged().collect { list ->
                 val forecast = list.filter { it.idCity == viewModel.currentId }
                 if(forecast.isNotEmpty()) {
                     binding.forecast = forecast[0]

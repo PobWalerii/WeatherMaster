@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.weathermaster.R
 import com.example.weathermaster.settings.AppSettings
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,58 +22,70 @@ class LocationManager @Inject constructor(
 ) {
 
     private val serviceIntent = createServiceIntent()
+    private val isServiceStatus: StateFlow<Boolean> = appSettings.isServiceStatus
 
     fun init(activity: Activity) {
-        val permissionGranted = requestLocationPermission(activity)
+        val permissionGranted = checkLocationPermission()
         if (permissionGranted) {
-            appSettings.setIsPermissionStatus(true)
             startService()
+        } else {
+            requestLocationPermission(activity)
         }
     }
 
-    private fun startService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent)
-        } else {
-            context.startService(serviceIntent)
+    fun startService() {
+        if(!isServiceStatus.value) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
         }
+        appSettings.setIsServiceStatus()
+        appSettings.setIsPermissionStatus()
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    fun requestLocationPermission(activity: Activity): Boolean {
+    private fun checkLocationPermission(): Boolean {
         var permissionGranted = false
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val coarseLocationPermission = android.Manifest.permission.ACCESS_COARSE_LOCATION
             val coarseLocationPermissionGranted = ContextCompat.checkSelfPermission(
                 context, coarseLocationPermission
             ) == PackageManager.PERMISSION_GRANTED
-            if (!coarseLocationPermissionGranted){
-                val permission = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                val permissionRequested =
-                    ActivityCompat.shouldShowRequestPermissionRationale(activity, permission[0])
-                if (permissionRequested) {
-                    Toast.makeText(activity, context.getString(R.string.permission), Toast.LENGTH_SHORT).show()
-                } else {
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        permission,
-                        REQUEST_LOCATION_PERMISSION
-                    )
-                }
-            } else{
+            if (coarseLocationPermissionGranted) {
                 permissionGranted = true
             }
-        } else{
+        } else {
             permissionGranted = true
         }
         return permissionGranted
     }
 
+    fun requestLocationPermission(activity: Activity) {
+        val permission = arrayOf(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val permissionRequested =
+            ActivityCompat.shouldShowRequestPermissionRationale(activity, permission[0])
+        if (permissionRequested) {
+            Toast.makeText(activity, context.getString(R.string.permission), Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            ActivityCompat.requestPermissions(
+                activity,
+                permission,
+                REQUEST_LOCATION_PERMISSION
+            )
+        }
+    }
+
     private fun createServiceIntent() = Intent(context, LocationService::class.java)
 
     companion object {
-        private const val REQUEST_LOCATION_PERMISSION = 1000
+        const val REQUEST_LOCATION_PERMISSION = 1000
     }
 
 }

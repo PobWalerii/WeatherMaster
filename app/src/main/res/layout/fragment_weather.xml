@@ -157,10 +157,24 @@
             android:background="@drawable/forecast_back"
             android:src="@drawable/city"
             android:layout_marginStart="@dimen/forecast_margin"
-            app:layout_constraintTop_toBottomOf="@id/forecast_layout"
+            android:layout_marginBottom="@dimen/button_city_margin_bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="ContentDescription" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="@dimen/forecast_margin"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="@+id/button_city"
+            app:layout_constraintTop_toTopOf="@+id/button_city"
+            app:layout_constraintStart_toEndOf="@+id/button_city"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,6 +45,7 @@ class CityListFragment : Fragment() {
         setupAdapter()
         setupRecycler()
         loadCityList()
+        observeCityList()
         setupBackClickListener()
         setupKeyPlusClickListener()
     }
@@ -61,12 +62,22 @@ class CityListFragment : Fragment() {
     }
 
     private fun loadCityList() {
+        viewModel.loadCityList()
+    }
+
+    private fun observeCityList() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val list = viewModel.loadCityList()
-            adapter.setList(list.filter { it.number != 0 })
-            if(viewModel.addCityResult.value) {
-                recycler.layoutManager?.scrollToPosition(adapter.itemCount-1)
+            viewModel.cityList.collect { cityList ->
+                adapter.setList(cityList)
+                checkScroll()
             }
+        }
+    }
+
+    private fun checkScroll() {
+        if (viewModel.addCityResult.value) {
+            recycler.layoutManager?.scrollToPosition(adapter.itemCount - 1)
+            viewModel.isScrolled()
         }
     }
 

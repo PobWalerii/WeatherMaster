@@ -27,9 +27,6 @@ class AppSettings(
     private val _necessaryRefreshForecast = MutableStateFlow(false)
     private val necessaryRefreshForecast: StateFlow<Boolean> = _necessaryRefreshForecast
 
-    //private val _currentRefresh = MutableStateFlow(false)
-    //val currentRefresh: StateFlow<Boolean> = _currentRefresh.asStateFlow()
-
     private val _checkCity = MutableStateFlow(false)
     val checkCity: StateFlow<Boolean> = _checkCity.asStateFlow()
 
@@ -37,11 +34,8 @@ class AppSettings(
         _latitude.value = latitude
         _longitude.value = longitude
         _checkCity.value = true
-        //_currentRefresh.value = true
     }
-    //fun setCurrentRefresh() {
-    //    _currentRefresh.value = false
-    //}
+
     fun setCheckCity() {
         _checkCity.value = false
     }
@@ -65,6 +59,9 @@ class AppSettings(
 
     private val _isPermissionStatus = MutableStateFlow(false)
     val isPermissionStatus: StateFlow<Boolean> = _isPermissionStatus.asStateFlow()
+
+    private val _isServiceStatus = MutableStateFlow(false)
+    val isServiceStatus: StateFlow<Boolean> = _isServiceStatus.asStateFlow()
 
     //private val _isDateChanged = MutableStateFlow(false)
     //val isDateChanged: StateFlow<Boolean> = _isDateChanged.asStateFlow()
@@ -156,8 +153,12 @@ class AppSettings(
         _isConnectStatus.value = state
     }
 
-    fun setIsPermissionStatus(state: Boolean) {
-        _isPermissionStatus.value = state
+    fun setIsPermissionStatus() {
+        _isPermissionStatus.value = true
+    }
+
+    fun setIsServiceStatus() {
+        _isServiceStatus.value = true
     }
 
     //fun setIsDateChanged(state: Boolean) {

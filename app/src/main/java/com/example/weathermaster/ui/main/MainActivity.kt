@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var connectReceiver: ConnectReceiver
     @Inject
     lateinit var repository: Repository
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         startSplash(this)
         super.onCreate(savedInstanceState)
@@ -45,6 +47,15 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         connectReceiver.close()
         appSettings.close()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationManager.init(this)
     }
 
 }
