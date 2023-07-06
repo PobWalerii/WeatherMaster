@@ -55,4 +55,7 @@ interface WeatherDao {
     @Query("SELECT * FROM ForecastWeather ORDER BY idCity, date")
     fun getForecastList(): Flow<List<ForecastWeather>>
 
+    @Query("DELETE FROM ForecastWeather WHERE date < :currentDate")
+    suspend fun clearOldForecast(currentDate: String)
+
 }

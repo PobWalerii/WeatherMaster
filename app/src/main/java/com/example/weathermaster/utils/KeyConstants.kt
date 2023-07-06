@@ -1,6 +1,7 @@
 package com.example.weathermaster.utils
 
 object KeyConstants {
+
     const val DATABASE_NAME = "data-weather"
     const val BASE_URL = "https://api.openweathermap.org/"
     const val IMAGE_URL = "https://openweathermap.org/img/w/"
@@ -10,6 +11,6 @@ object KeyConstants {
     const val MEASUREMENT2 = "metric"
     const val MEASUREMENT3 = "imperial"
     const val NOTIFICATION_ID = 1234512345
-    const val CHECK_LOCATION_TIME_INTERVAL = 1
-    const val CHECK_LOCATION_DISTANCE = 10000F
+    const val FORECAST_HOUR_STEP = 3
+
 }

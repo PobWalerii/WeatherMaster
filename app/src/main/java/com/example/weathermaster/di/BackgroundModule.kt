@@ -1,7 +1,7 @@
 package com.example.weathermaster.di
 
 import android.content.Context
-import com.example.weathermaster.geolocation.LocationManager
+import com.example.weathermaster.workmanager.DataUpdateManager
 import com.example.weathermaster.settings.AppSettings
 import dagger.Module
 import dagger.Provides
@@ -12,16 +12,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LocationModule {
+object BackgroundModule {
 
     @Singleton
     @Provides
-    fun provideLocationManager(
-        appSettings: AppSettings,
+    fun provideDataUpdateManager(
         @ApplicationContext applicationContext: Context,
-    ): LocationManager {
-        return LocationManager(appSettings, applicationContext)
+        appSettings: AppSettings
+    ): DataUpdateManager {
+        return DataUpdateManager(applicationContext,  appSettings)
     }
-
 
 }

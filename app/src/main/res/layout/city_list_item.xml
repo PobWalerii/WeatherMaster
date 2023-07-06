@@ -13,6 +13,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/item_city_margin"
@@ -68,6 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{item.temp+item.tempSimbol}"
+                android:visibility="@{item.icon.isEmpty ? View.GONE : View.VISIBLE}"
                 android:textSize="@dimen/item_info_size" />
 
             <ImageView

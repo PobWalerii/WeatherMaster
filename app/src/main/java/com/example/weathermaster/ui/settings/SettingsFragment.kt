@@ -5,14 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.weathermaster.databinding.FragmentSettingsBinding
 import com.example.weathermaster.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
@@ -62,31 +60,12 @@ class SettingsFragment : Fragment() {
 
     private fun showSettings() {
         binding.measurement = viewModel.measurement.value
-
-
-        /*
-        binding.firstRun = viewModel.firstRun.value
-        binding.defaultHeader = viewModel.defaultHeader.value
-        binding.specificationLine = viewModel.specificationLine.value
-        binding.defaultAddIfClick = viewModel.defaultAddIfClick.value
-        binding.deleteIfSwiped = viewModel.deleteIfSwiped.value
-        binding.dateChanged = viewModel.dateChanged.value
-        binding.showMessageInternetOk = viewModel.showMessageInternetOk.value
-        binding.startDelayValue = viewModel.startDelayValue.value
-        binding.queryDelayValue = viewModel.queryDelayValue.value
-        binding.requestIntervalValue = viewModel.requestIntervalValue.value
-        binding.operationDelayValue = viewModel.operationDelayValue.value
-        binding.createBackgroundRecords = viewModel.createBackgroundRecords.value
-        binding.intervalCreateRecords = viewModel.intervalCreateRecords.value
-         */
     }
-
-
 
     private fun setListenersSettingsChanged() {
         val switches = listOf(binding.switch1, binding.switch2, binding.switch3)
         switches.forEachIndexed { index, switch ->
-            switch.setOnCheckedChangeListener { buttonView, isChecked ->
+            switch.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     switches.forEachIndexed { innerIndex, innerSwitch ->
                         if (innerIndex != index) {
@@ -107,53 +86,17 @@ class SettingsFragment : Fragment() {
     private fun getIsChange(): Boolean {
         return viewModel.isChange(
             getMeasurementValue()
-
-            /*
-            binding.switch6.isChecked,
-            binding.header.text.toString(),
-            binding.switch1.isChecked,
-            binding.switch2.isChecked,
-            binding.switch3.isChecked,
-            binding.switch4.isChecked,
-            binding.switch5.isChecked,
-            binding.startDelay.text.toString(),
-            binding.queryDelay.text.toString(),
-            binding.requestInterval.text.toString(),
-            binding.operationDelay.text.toString(),
-            binding.switch7.isChecked,
-            binding.intervalCreate.text.toString()
-             */
-        )}
+        )
+    }
 
     private fun getMeasurementValue(): Int =
         if(binding.switch1.isChecked) 1
         else if(binding.switch2.isChecked) 2
         else 3
 
-
-
-
     private fun saveSettings() {
         viewModel.savePreferences(
             getMeasurementValue()
-
-            /*
-            binding.switch6.isChecked,
-            binding.header.text.toString(),
-            binding.switch1.isChecked,
-            binding.switch2.isChecked,
-            binding.switch3.isChecked,
-            binding.switch4.isChecked,
-            binding.switch5.isChecked,
-            startDelayValue = binding.startDelay.text.toString().toIntOrNull() ?: 0,
-            queryDelayValue = binding.queryDelay.text.toString().toIntOrNull() ?: 0,
-            requestIntervalValue = binding.requestInterval.text.toString().toIntOrNull()
-                ?: 0,
-            operationDelayValue = binding.operationDelay.text.toString().toIntOrNull()
-                ?: 0,
-            binding.switch7.isChecked,
-            intervalCreateRecords = binding.intervalCreate.text.toString().toIntOrNull() ?:
-             */
         )
         definitionOfChange()
     }

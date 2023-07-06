@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.database.base.AppDatabase
 import com.example.weathermaster.data.database.dao.WeatherDao
+import com.example.weathermaster.data.repository.RepoCity
+import com.example.weathermaster.data.repository.RepoWeather
 import com.example.weathermaster.data.repository.Repository
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
@@ -41,13 +43,41 @@ object DatabaseModule {
         weatherDao: WeatherDao,
         apiService: ApiService,
         appSettings: AppSettings,
+        repoCity: RepoCity,
+        repoWeather: RepoWeather,
         notificationManager: NotificationManager,
         @ApplicationContext applicationContext: Context,
     ): Repository {
         return Repository(weatherDao,
             apiService,
             appSettings,
+            repoCity,
+            repoWeather,
             notificationManager,
+            applicationContext)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRepoCity(
+        weatherDao: WeatherDao,
+        apiService: ApiService,
+        @ApplicationContext applicationContext: Context,
+    ): RepoCity {
+        return RepoCity(weatherDao,
+            apiService,
+            applicationContext)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRepoWeather(
+        weatherDao: WeatherDao,
+        apiService: ApiService,
+        @ApplicationContext applicationContext: Context,
+    ): RepoWeather {
+        return RepoWeather(weatherDao,
+            apiService,
             applicationContext)
     }
 

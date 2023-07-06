@@ -8,16 +8,18 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="com.example.weathermaster.data.database.entity.CityAndWeatherFormated" />
+            type="com.example.weathermaster.data.database.entity.ForecastWeatherHour" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/item_city_margin"
-        android:paddingVertical="@dimen/string_city_padding_vertical"
-        android:paddingHorizontal="@dimen/string_city_padding_horizontal"
+        android:elevation="@dimen/hour_item_elevation"
+        android:layout_marginVertical="@dimen/hour_item_margin_vertical"
+        android:layout_marginStart="@dimen/hour_item_margin_horizontal"
+        android:paddingTop="@dimen/hour_item_padding_vertical"
+        android:paddingHorizontal="@dimen/hour_item_padding_horizontal"
         android:background="@drawable/city_string_back">
 
         <LinearLayout
@@ -33,15 +35,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{item.cityName}"
-                android:textSize="@dimen/item_title_size"/>
+                android:text="@{item.dn}"
+                android:textColor="@color/yellow"
+                android:textSize="@dimen/hour_item_date_size"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{item.temp+item.tempSimbol}"
-                android:visibility="@{item.icon.isEmpty ? View.GONE : View.VISIBLE}"
-                android:textSize="@dimen/item_info_size" />
+                android:text="@{item.hour}"
+                android:textSize="@dimen/hour_item_date_size"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{item.tempString}'
+                android:layout_marginTop="@dimen/hour_item_temp_margin"
+                android:textSize="@dimen/hour_item_temp_size" />
 
             <ImageView
                 android:layout_width="@dimen/forecast_ico_size"

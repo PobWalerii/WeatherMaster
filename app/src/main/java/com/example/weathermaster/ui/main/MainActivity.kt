@@ -6,7 +6,7 @@ import androidx.navigation.findNavController
 import com.example.weathermaster.R
 import com.example.weathermaster.connectreceiver.ConnectReceiver
 import com.example.weathermaster.data.repository.Repository
-import com.example.weathermaster.geolocation.LocationManager
+import com.example.weathermaster.workmanager.DataUpdateManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.SplashScreen.startSplash
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appSettings: AppSettings
     @Inject
-    lateinit var locationManager: LocationManager
+    lateinit var manager: DataUpdateManager
     @Inject
     lateinit var connectReceiver: ConnectReceiver
     @Inject
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         connectReceiver.init()
-        locationManager.init(this)
+        manager.init(this)
     }
 
     override fun onDestroy() {
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        locationManager.init(this)
+        manager.init(this)
     }
 
 }

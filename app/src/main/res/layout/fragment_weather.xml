@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="com.example.weathermaster.R" />
         <import type="android.view.View" />
         <variable
@@ -13,6 +12,7 @@
         <variable
             name="forecast"
             type="com.example.weathermaster.data.database.entity.ForecastWeatherDay" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,13 +26,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_title_top"
-            android:text="@{city.cityName}"
+            android:text='@{city.cityName}'
             android:textColor="@color/white"
             android:textSize="@dimen/title_size"
             app:layout_constraintEnd_toStartOf="@+id/settings"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <LinearLayout
             android:id="@+id/tempCurrent"
@@ -90,51 +89,122 @@
             android:textSize="@dimen/current_content_size"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weather_icon" />
+            app:layout_constraintTop_toBottomOf="@+id/weather" />
 
         <LinearLayout
             android:id="@+id/forecast_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="@dimen/forecast_layout_size"
             android:layout_marginHorizontal="@dimen/forecast_margin"
             android:layout_marginTop="@dimen/forecast_margin_top"
             android:background="@drawable/forecast_back"
+            android:elevation="@dimen/forecast_elevation"
+            android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/other"
             tools:ignore="MissingConstraints">
 
-        <include
-            android:id="@+id/line1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/forecast_margin"
-            layout="@layout/string_forecast"/>
+            <LinearLayout
+                android:id="@+id/forecastHour"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-        <include
-            android:id="@+id/line2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/string_forecast"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    tools:ignore="UseCompoundDrawables">
 
-        <include
-            android:id="@+id/line3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/forecast_margin"
-            layout="@layout/string_forecast"/>
+                    <ImageView
+                        android:id="@+id/arrowHour"
+                        android:layout_width="@dimen/button_size"
+                        android:layout_height="@dimen/button_size"
+                        android:layout_marginTop="@dimen/hour_ico_margin_top"
+                        android:layout_marginBottom="@dimen/hour_ico_margin_bottom"
+                        android:layout_marginStart="@dimen/hour_ico_margin_start"
+                        android:src="@drawable/eject"
+                        tools:ignore="ContentDescription" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_back"
-            android:paddingVertical="@dimen/forecast_margin"
-            android:layout_marginHorizontal="@dimen/forecast_margin"
-            android:gravity="center"
-            android:layout_marginBottom="@dimen/detail_margin_bottom"
-            android:layout_marginTop="@dimen/forecast_margin"
-            android:text="@string/detail"
-            android:textColor="@color/white"
-            android:textSize="@dimen/current_info_size"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/hour_title_margin_start"
+                        android:text="@string/detail"
+                        android:textSize="@dimen/hour_title_size" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerHour"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="@dimen/hour_item_margin_horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:ignore="RtlSymmetry" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/hour_chart_height"
+                        android:layout_marginTop="@dimen/hour_chart_margin_top"
+                        android:layout_marginHorizontal="@dimen/hour_chart_margin_horizontal"
+                        tools:ignore="MissingClass" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/forecastDay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
+
+                <include
+                    android:id="@+id/line1"
+                    layout="@layout/string_forecast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/forecast_margin" />
+
+                <include
+                    android:id="@+id/line2"
+                    layout="@layout/string_forecast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include
+                    android:id="@+id/line3"
+                    layout="@layout/string_forecast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/forecast_margin" />
+
+                <TextView
+                    android:id="@+id/detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/forecast_margin"
+                    android:layout_marginTop="@dimen/forecast_margin"
+                    android:layout_marginBottom="@dimen/detail_margin_bottom"
+                    android:background="@drawable/button_back"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/forecast_margin"
+                    android:text="@string/detail"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/current_info_size" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -150,32 +220,34 @@
             app:layout_constraintTop_toTopOf="@+id/title"
             tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/button_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/forecast_back"
-            android:src="@drawable/city"
-            android:layout_marginStart="@dimen/forecast_margin"
-            android:layout_marginBottom="@dimen/button_city_margin_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="ContentDescription" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
             android:layout_marginHorizontal="@dimen/forecast_margin"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/recycler_city_padding_start"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="@+id/button_city"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/button_city"
-            app:layout_constraintStart_toEndOf="@+id/button_city"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            tools:ignore="RtlSymmetry" />
 
-
+        <ImageView
+            android:id="@+id/button_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/forecast_margin"
+            android:layout_marginBottom="@dimen/button_city_margin_bottom"
+            android:elevation="@dimen/button_city_elevation"
+            android:background="@drawable/forecast_back"
+            android:src="@drawable/city"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

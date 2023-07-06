@@ -1,12 +1,14 @@
 package com.example.weathermaster.data.mapers
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
 import com.example.weathermaster.data.apiservice.response.LocationItem
 import com.example.weathermaster.data.apiservice.result.SearchListItem
 import com.example.weathermaster.data.database.entity.*
+import com.example.weathermaster.utils.KeyConstants.FORECAST_HOUR_STEP
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -124,68 +126,89 @@ object Mapers {
     fun forecastToForecastWeatherDay(list: List<ForecastWeather>, measurement: Int): List<ForecastWeatherDay> {
 
         val forecastDay: MutableList<ForecastWeatherDay> = mutableListOf()
+
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val currentDate = dateFormat.format(Date())
-        var startId = 0L
-        var startDate = "0000-00-00"
-        val descriptionCounts = mutableMapOf<String, Int>()
-        val iconCounts = mutableMapOf<String, Int>()
-        var minTemp = 0.0
-        var maxTemp = 0.0
 
-        list.filter { it.date.substring(0,10) >= currentDate }.map { item ->
+        val groupedData = list.filter { it.date.substring(0, 10) >= currentDate }
+            .groupBy { Pair(it.idCity, it.date.substring(0, 10)) }
 
-            if(item.idCity != startId || item.date.substring(0,10) != startDate) {
-                if(startDate != "0000-00-00") {
-                    var maxCount = 0
-                    var dominantDescription = ""
-                    for ((description, count) in descriptionCounts) {
-                        if (count > maxCount) {
-                            dominantDescription = description
-                            maxCount = count
-                        }
-                    }
-                    maxCount = 0
-                    var dominantIcon = ""
-                    for ((icon, count) in iconCounts) {
-                        if (count > maxCount) {
-                            dominantIcon = icon
-                            maxCount = count
-                        }
-                    }
+        groupedData.forEach { (key, values) ->
 
-                    forecastDay.add(
-                        ForecastWeatherDay(
-                            startId,
-                            startDate,
-                            getDn(startDate).replaceFirstChar { it.uppercase() },
-                            ((convertTemp(minTemp, measurement) * 10.0).roundToLong() / 10.0).toString() + " / " +
-                                    ((convertTemp(maxTemp, measurement) * 10.0).roundToLong() / 10.0).toString() + listOf(
-                                "K",
-                                "\u2103",
-                                "\u2109"
-                            )[measurement - 1],
-                            dominantDescription.replaceFirstChar { it.uppercase() },
-                            dominantIcon
-                        )
-                    )
+            val (idCity, dateForecast) = key
+
+            val minTemp = values.minByOrNull { it.temp }?.temp ?: 0.0
+            val maxTemp = values.maxByOrNull { it.temp }?.temp ?: 0.0
+
+            val descriptionCounts = values.groupBy { it.description }
+                .mapValues { (_, items) -> items.size }
+
+            var maxCount = 0
+            var dominantDescription = ""
+            for ((description, count) in descriptionCounts) {
+                if (count > maxCount) {
+                    dominantDescription = description
+                    maxCount = count
                 }
-                startId = item.idCity
-                startDate = item.date.substring(0, 10)
-                descriptionCounts.clear()
-                iconCounts.clear()
-                minTemp = item.temp
-                maxTemp = item.temp
-            } else {
-                if(item.temp<minTemp) minTemp = item.temp
-                if(item.temp>maxTemp) maxTemp = item.temp
-                var counts = iconCounts.getOrDefault(item.icon, 0)
-                iconCounts[item.icon] = counts + 1
-                counts = descriptionCounts.getOrDefault(item.description, 0)
-                descriptionCounts[item.description] = counts + 1
             }
+
+            val iconCounts = values.groupBy { it.icon }
+                .mapValues { (_, items) -> items.size }
+
+            maxCount = 0
+            var dominantIcon = ""
+            for ((icon, count) in iconCounts) {
+                if (count > maxCount) {
+                    dominantIcon = icon
+                    maxCount = count
+                }
+            }
+
+            forecastDay.add(
+                ForecastWeatherDay(
+                    idCity,
+                    dateForecast,
+                    getDn(dateForecast).replaceFirstChar { it.uppercase() },
+                    ((convertTemp(minTemp, measurement) * 10.0).roundToLong() / 10.0).toString() + " / " +
+                            ((convertTemp(maxTemp, measurement) * 10.0).roundToLong() / 10.0).toString() + listOf(
+                        "K",
+                        "\u2103",
+                        "\u2109"
+                    )[measurement - 1],
+                    dominantDescription.replaceFirstChar { it.uppercase() },
+                    dominantIcon
+                )
+            )
         }
         return forecastDay
+    }
+
+    fun forecastToForecastWeatherHour(list: List<ForecastWeather>, measurement: Int): List<ForecastWeatherHour> {
+
+        val forecastHour: MutableList<ForecastWeatherHour> = mutableListOf()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val date = Date().time - FORECAST_HOUR_STEP*3600*1000L
+        val currentTime = dateFormat.format(date).substring(0,14)+"00:00"
+
+        list.filter { it.date >= currentTime }.map {
+            val temp = ((convertTemp(it.temp, measurement) * 10.0).roundToLong() / 10.0)
+            forecastHour.add(
+                ForecastWeatherHour(
+                    it.idCity,
+                    it.date.substring(11,16),
+                    getDn(it.date.substring(0,10)).replaceFirstChar { it.uppercase() },
+                    temp.toFloat(),
+                    temp.toString() + listOf(
+                        "K",
+                        "\u2103",
+                        "\u2109"
+                    )[measurement - 1],
+                    it.icon
+                )
+            )
+
+        }
+        return forecastHour
     }
 
     private fun getDn(startDate: String): String {

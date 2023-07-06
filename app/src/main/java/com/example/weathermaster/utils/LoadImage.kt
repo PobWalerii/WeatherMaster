@@ -7,14 +7,14 @@ import com.bumptech.glide.Glide
 object LoadImage {
 
     fun loadImageFromUrl(imageUrl: String, context: Context): Bitmap? {
-        try {
-            return Glide.with(context)
+        return try {
+            Glide.with(context)
                 .asBitmap()
                 .load(imageUrl)
                 .submit()
                 .get()
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 }

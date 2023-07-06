@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/weather_icon"
             android:layout_width="@dimen/forecast_ico_size"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/forecast_ico_size"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:showIcon="@{forecast.icon}"

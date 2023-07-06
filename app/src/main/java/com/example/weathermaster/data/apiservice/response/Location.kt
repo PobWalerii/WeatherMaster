@@ -1,7 +1,6 @@
 package com.example.weathermaster.data.apiservice.response
 import com.google.gson.annotations.SerializedName
 
-
 class Location : ArrayList<LocationItem>()
 
 class LocationItem(
