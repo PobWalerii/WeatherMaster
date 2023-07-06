@@ -1,4 +1,4 @@
-package com.example.weathermaster.data.apiservice.result
+package com.example.weathermaster.data.database.entity
 
 data class SearchListItem(
     val cityName: String,

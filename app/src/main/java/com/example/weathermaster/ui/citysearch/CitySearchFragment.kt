@@ -11,12 +11,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
-import com.example.weathermaster.data.apiservice.result.SearchListItem
+import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.databinding.FragmentCitySearchBinding
 import com.example.weathermaster.ui.main.MainActivity
 import com.example.weathermaster.utils.HideKeyboard.hideKeyboardFromView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 
@@ -44,38 +43,56 @@ class CitySearchFragment : Fragment() {
         setupRecycler()
         setupBackClickListener()
         setOnSearchClickListener()
-        observeIsLoadData()
-        observeLoadData()
+        observeSearchState()
         setupAddClickListener()
         observeAddCityResult()
     }
 
+    private fun observeSearchState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.searchState.collect { state ->
+                when (state) {
+                    is SearchCityState.Loading -> {
+                        showLoading(true)
+                    }
+                    is SearchCityState.Success -> {
+                        showSearchList(state.searchList)
+                    }
+                    is SearchCityState.Empty -> {
+                        showEmptyResult()
+                    }
+                    is SearchCityState.Error -> {
+                        showError(state.errorMessage)
+                    }
+                    is SearchCityState.Loaded -> {
+                        showLoading(false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.isLoadData = isLoading
+    }
+    private fun showSearchList(searchList: List<SearchListItem>) {
+        adapter.setList(searchList)
+    }
+    private fun showEmptyResult() {
+        adapter.setList(emptyList())
+        Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
+    }
+    private fun showError(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun setupAdapter() {
         adapter = SearchListAdapter()
-        adapter.setHasStableIds(true)
     }
 
     private fun setupRecycler() {
         recycler = binding.recycler
         recycler.adapter = adapter
-    }
-
-    private fun observeLoadData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            combine(viewModel.searchListItem, viewModel.isLoadData) { searchList, isLoadData ->
-                Pair(searchList, isLoadData)
-            }.collect { (searchList, isLoadData) ->
-                if (searchList != null && !isLoadData) {
-                    if (searchList.isEmpty()) {
-                        Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
-                    } else {
-                        adapter.setList(searchList)
-                    }
-                } else if (searchList == null) {
-                    adapter.setList(emptyList())
-                }
-            }
-        }
     }
 
     private fun setupAddClickListener() {
@@ -88,14 +105,6 @@ class CitySearchFragment : Fragment() {
 
     private fun addCityToList(current: SearchListItem) {
         viewModel.addCity(current)
-    }
-
-    private fun observeIsLoadData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.isLoadData.collect {
-                binding.isLoadData = it
-            }
-        }
     }
 
     private fun setOnSearchClickListener() {

@@ -10,7 +10,6 @@ import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
 import com.example.weathermaster.databinding.CityListItemBinding
 import java.util.*
 
-
 @SuppressLint("NotifyDataSetChanged")
 class CityListAdapter: RecyclerView.Adapter<CityListAdapter.ViewHolder>() {
 

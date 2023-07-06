@@ -4,13 +4,9 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
-import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
-import com.example.weathermaster.data.database.entity.ForecastWeatherDay
 import com.example.weathermaster.data.database.entity.ForecastWeatherHour
-import com.example.weathermaster.databinding.CityStringItemBinding
 import com.example.weathermaster.databinding.ForecastHourItemBinding
 import java.util.*
 
@@ -30,8 +26,7 @@ class HourForecastAdapter: RecyclerView.Adapter<HourForecastAdapter.ViewHolder>(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.forecast_hour_item, parent, false)
-        val holder = ViewHolder(view)
-        return holder
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

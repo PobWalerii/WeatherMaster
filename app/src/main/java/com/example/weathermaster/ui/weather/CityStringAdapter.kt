@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
 import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
@@ -52,8 +51,6 @@ class CityStringAdapter: RecyclerView.Adapter<CityStringAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int = listCity.size
     override fun getItemId(position: Int) = listCity[position].id
-
-    //fun getItemFromPosition(position: Int): CityAndWeatherFormated = listCity[position]
 
     fun setList(list: List<CityAndWeatherFormated>) {
         listCity.clear()

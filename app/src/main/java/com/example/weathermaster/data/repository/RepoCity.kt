@@ -5,7 +5,7 @@ import android.widget.Toast
 import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.LocationItem
-import com.example.weathermaster.data.apiservice.result.SearchListItem
+import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.database.entity.City
 import com.example.weathermaster.data.mapers.Mapers

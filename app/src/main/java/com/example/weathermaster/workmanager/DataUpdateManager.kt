@@ -25,10 +25,9 @@ class DataUpdateManager @Inject constructor(
             checkPermission.requestLocationPermission(activity)
         } else {
             startService()
-            appSettings.setIsServiceStatus()
+            //appSettings.setIsServiceStatus()
         }
     }
-
     private fun startService() {
 
         val constraints = Constraints.Builder()

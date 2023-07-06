@@ -4,7 +4,7 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="com.example.weathermaster.data.apiservice.result.SearchListItem" />
+            type="com.example.weathermaster.data.database.entity.SearchListItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

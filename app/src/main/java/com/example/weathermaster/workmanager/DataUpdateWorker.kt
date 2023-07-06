@@ -23,9 +23,9 @@ class DataUpdateWorker @AssistedInject constructor(
     private val repoWeather: RepoWeather
 ): CoroutineWorker(context, params) {
 
-    val sPref: SharedPreferences =
+    private val sPref: SharedPreferences =
         applicationContext.getSharedPreferences("MyServices", AppCompatActivity.MODE_PRIVATE)
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override suspend fun doWork(): Result {
         val isLocation = updateCurrentLocation()

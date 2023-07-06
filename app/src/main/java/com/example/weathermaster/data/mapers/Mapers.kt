@@ -1,12 +1,11 @@
 package com.example.weathermaster.data.mapers
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
 import com.example.weathermaster.data.apiservice.response.LocationItem
-import com.example.weathermaster.data.apiservice.result.SearchListItem
+import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.data.database.entity.*
 import com.example.weathermaster.utils.KeyConstants.FORECAST_HOUR_STEP
 import java.text.SimpleDateFormat
@@ -196,7 +195,7 @@ object Mapers {
                 ForecastWeatherHour(
                     it.idCity,
                     it.date.substring(11,16),
-                    getDn(it.date.substring(0,10)).replaceFirstChar { it.uppercase() },
+                    getDn(it.date.substring(0,10)).replaceFirstChar { day -> day.uppercase() },
                     temp.toFloat(),
                     temp.toString() + listOf(
                         "K",

@@ -5,7 +5,7 @@ import android.widget.Toast
 import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.*
-import com.example.weathermaster.data.apiservice.result.SearchListItem
+import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.database.entity.*
 import com.example.weathermaster.data.mapers.Mapers.forecastToForecastWeatherDay
@@ -14,6 +14,7 @@ import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.data.mapers.Mapers.weaterToWeaterFormated
 import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
+import com.example.weathermaster.ui.citysearch.SearchCityState
 import com.example.weathermaster.utils.KeyConstants.API_KEY
 import com.example.weathermaster.workmanager.StartCityGetWorker.cityGetWeatherWorker
 import kotlinx.coroutines.*
@@ -32,11 +33,11 @@ class Repository @Inject constructor(
     private val applicationContext: Context,
 ) {
 
-    private val measurement: StateFlow<Int> = appSettings.measurement
-
-    private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
     //private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
     //private val isServiceStatus: StateFlow<Boolean> = appSettings.isServiceStatus
+    private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
+
+    val measurement: StateFlow<Int> = appSettings.measurement
 
     val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
         .map { list ->
@@ -55,14 +56,11 @@ class Repository @Inject constructor(
             forecastToForecastWeatherDay(list, measurement.value)
         }
 
-    private val _isLoadData = MutableStateFlow(false)
-    val isLoadData: StateFlow<Boolean> = _isLoadData.asStateFlow()
-
-    private val _searchListItem = MutableStateFlow<List<SearchListItem>?>(null)
-    val searchListItem: StateFlow<List<SearchListItem>?> = _searchListItem
-
     private val _addCityResult = MutableStateFlow(false)
     val addCityResult: StateFlow<Boolean> = _addCityResult
+
+    private val _searchState = MutableStateFlow<SearchCityState>(SearchCityState.Loaded)
+    val searchState: StateFlow<SearchCityState> = _searchState
 
     fun init() {
         showNotification()
@@ -79,29 +77,31 @@ class Repository @Inject constructor(
     }
 
     fun getSearchList(keyWord: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _isLoadData.value = true
+        MainScope().launch {
+            _searchState.value = SearchCityState.Loading
             try {
-                val response: Location = apiService.getSearchList(
-                    keyWord,
-                    10,
-                    API_KEY
-                )
-                val list: List<SearchListItem> = toCityList(response, languageCode)
-                _searchListItem.value = list
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_LONG).show()
+                withContext(Dispatchers.IO) {
+                    val response: Location =
+                        apiService.getSearchList(
+                            keyWord,
+                            10,
+                            API_KEY
+                        )
+                    val list: List<SearchListItem> = toCityList(response, languageCode)
+                    _searchState.value = if (list.isNotEmpty()) {
+                        SearchCityState.Success(list)
+                    } else {
+                        SearchCityState.Empty
+                    }
                 }
+            } catch (e: Exception) {
+                _searchState.value = SearchCityState.Error(e.message.toString())
             } finally {
-                _isLoadData.value = false
+                _searchState.value = SearchCityState.Loaded
             }
         }
     }
 
-    fun searchListToNull() {
-        _searchListItem.value = null
-    }
     fun setAddCityResult() {
         _addCityResult.value = false
     }
@@ -150,6 +150,4 @@ class Repository @Inject constructor(
             }
         }
     }
-
-
 }

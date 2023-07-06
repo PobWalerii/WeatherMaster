@@ -16,16 +16,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weathermaster.R
+import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
+import com.example.weathermaster.data.database.entity.ForecastWeatherDay
+import com.example.weathermaster.data.database.entity.ForecastWeatherHour
 import com.example.weathermaster.databinding.FragmentWeatherBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import kotlinx.coroutines.Job
 
 @AndroidEntryPoint
 class WeatherFragment : Fragment() {
@@ -41,13 +41,11 @@ class WeatherFragment : Fragment() {
     private lateinit var adapterHour: HourForecastAdapter
     private lateinit var recyclerHour: RecyclerView
 
-    private var forecastHourJob: Job? = null
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             updateChartWithVisibleItems()
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,18 +59,61 @@ class WeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
         setupRecycler()
+        loadData()
         setupChart()
-
-        observeCityListData()
-        observeCurrentData()
-        observeForecastData()
-        //observeForecastHour()
-
+        observeScreenState()
         setupSettingsClickListener()
         setupCityButtonClickListener()
         setItemClickListener()
         setupDetailClickListener()
         setupHourArrowClickListener()
+    }
+
+    private fun loadData() {
+        viewModel.init()
+    }
+    private fun observeScreenState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.screenState.collect { state ->
+                when (state) {
+                    is WeatherScreenState.Loading -> {
+                    }
+                    is WeatherScreenState.Loaded -> {
+                        val cityAndWeatherList = state.currentCityList
+                        val selectedCityAndWeather = state.selectedCityAndWeather
+                        val selectedCityForecastDay = state.selectedCityForecastDay
+                        val selectedCityForecastHour = state.selectedCityForecastHour
+                        updateCurrentData(selectedCityAndWeather)
+                        updateCityListData(cityAndWeatherList)
+                        updateForecastDay(selectedCityForecastDay)
+                        updateForecastHour(selectedCityForecastHour)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateForecastHour(detail: List<ForecastWeatherHour>) {
+        adapterHour.setList(detail)
+        updateChartWithVisibleItems()
+    }
+
+    private fun updateCurrentData(cityWeather: CityAndWeatherFormated?) {
+        if(cityWeather != null) {
+            binding.city = cityWeather
+        }
+    }
+    private fun updateCityListData(cityList: List<CityAndWeatherFormated>) {
+        adapter.setList(cityList)
+    }
+
+    private fun updateForecastDay(forecast: List<ForecastWeatherDay>) {
+        if(forecast.isNotEmpty()) {
+            binding.forecast = forecast[0]
+            binding.line1.forecast = forecast[1]
+            binding.line2.forecast = forecast[2]
+            binding.line3.forecast = forecast[3]
+        }
     }
 
     private fun setupDetailClickListener() {
@@ -118,31 +159,11 @@ class WeatherFragment : Fragment() {
         })
     }
 
-    private fun observeCityListData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.listCityAndWeather.distinctUntilChanged().collect { list ->
-                adapter.setList(list)
-            }
-        }
-    }
-
     private fun observeForecastHour() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.selectedCityForecastHour.distinctUntilChanged().collect { list ->
-                adapterHour.setList(list)
-                updateChartWithVisibleItems()
-            }
-        }
         recyclerHour.addOnScrollListener(scrollListener)
-        //recyclerHour.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        //    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        //        updateChartWithVisibleItems()
-        //    }
-        //})
     }
 
     private fun unsubscribeForecastHour() {
-        forecastHourJob?.cancel()
         recyclerHour.removeOnScrollListener(scrollListener)
     }
 
@@ -153,55 +174,37 @@ class WeatherFragment : Fragment() {
         val end = layoutManager.findLastVisibleItemPosition()
 
         if ( start >= 0 && adapterHour.itemCount != 0) {
-
             val visibleItems = adapterHour.getItems(start, end)
-
             if (visibleItems.isNotEmpty()) {
-
-                val temperatureData: MutableList<Float> = mutableListOf()
-
-                visibleItems.map {
-                    temperatureData.add(it.temp)
-                }
-
-                val entries: List<Entry> = temperatureData.mapIndexed { index, temperature ->
-                    Entry(index.toFloat(), temperature)
-                }
-
-                val dataSet = LineDataSet(entries, "Temperature")
-                dataSet.setDrawValues(false)
-                dataSet.setDrawCircles(false)
-                dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-                dataSet.lineWidth = 1f
-                dataSet.color = Color.YELLOW
-                val lineData = LineData(dataSet)
-
-                val chart = binding.chart
-                chart.data = lineData
-                chart.invalidate()
+                val entries = getChartData(visibleItems)
+                refreshChart(entries)
             }
         }
     }
 
-    private fun observeCurrentData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.selectedCityAndWeather.distinctUntilChanged().collect {
-                binding.city = it
-            }
+    private fun getChartData(visibleItems: List<ForecastWeatherHour>): List<Entry> {
+        val temperatureData: MutableList<Float> = mutableListOf()
+        visibleItems.map {
+            temperatureData.add(it.temp)
         }
+        val entries: List<Entry> = temperatureData.mapIndexed { index, temperature ->
+            Entry(index.toFloat(), temperature)
+        }
+        return entries
     }
 
-    private fun observeForecastData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.selectedCityForecastDay.distinctUntilChanged().collect { forecast ->
-                if(forecast.isNotEmpty()) {
-                    binding.forecast = forecast[0]
-                    binding.line1.forecast = forecast[1]
-                    binding.line2.forecast = forecast[2]
-                    binding.line3.forecast = forecast[3]
-                }
-            }
-        }
+    private fun refreshChart(entries: List<Entry>) {
+        val dataSet = LineDataSet(entries, "Temperature")
+        dataSet.setDrawValues(false)
+        dataSet.setDrawCircles(false)
+        dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        dataSet.lineWidth = 1f
+        dataSet.color = Color.LTGRAY
+        val lineData = LineData(dataSet)
+
+        val chart = binding.chart
+        chart.data = lineData
+        chart.invalidate()
     }
 
     private fun setupAdapter() {

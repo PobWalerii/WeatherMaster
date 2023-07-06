@@ -21,8 +21,8 @@ class AppSettings(
     private val _isConnectStatus = MutableStateFlow(false)
     val isConnectStatus: StateFlow<Boolean> = _isConnectStatus.asStateFlow()
 
-    private val _isServiceStatus = MutableStateFlow(false)
-    val isServiceStatus: StateFlow<Boolean> = _isServiceStatus.asStateFlow()
+    //private val _isServiceStatus = MutableStateFlow(false)
+    //val isServiceStatus: StateFlow<Boolean> = _isServiceStatus.asStateFlow()
 
     private var sPref: SharedPreferences = applicationContext.getSharedPreferences("MyPref", AppCompatActivity.MODE_PRIVATE)
 
@@ -40,13 +40,13 @@ class AppSettings(
         _isConnectStatus.value = state
     }
 
-    fun setIsServiceStatus() {
-        _isServiceStatus.value = true
-    }
+    //fun setIsServiceStatus() {
+    //    _isServiceStatus.value = true
+    //}
 
     private fun getPreferences() {
         _isLoadedPreferences.value = false
-        _measurement.value = sPref.getInt("measurement", 1)
+        _measurement.value = sPref.getInt("measurement", 2)
         _isLoadedPreferences.value = true
     }
 

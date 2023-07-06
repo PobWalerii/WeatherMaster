@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weathermaster.R
-import com.example.weathermaster.data.apiservice.result.SearchListItem
+import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.databinding.SearhListItemBinding
 
 @SuppressLint("NotifyDataSetChanged")

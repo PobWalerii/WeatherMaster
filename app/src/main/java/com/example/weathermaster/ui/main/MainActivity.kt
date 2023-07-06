@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var repository: Repository
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         startSplash(this)
         super.onCreate(savedInstanceState)
