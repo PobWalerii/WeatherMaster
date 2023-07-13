@@ -8,8 +8,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.weathermaster.data.repository.RepoCity
 import com.example.weathermaster.data.repository.RepoWeather
-import com.example.weathermaster.geolocation.LocationProvider
-import com.example.weathermaster.permission.CheckPermission
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.text.SimpleDateFormat
@@ -28,7 +26,7 @@ class DataUpdateWorker @AssistedInject constructor(
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override suspend fun doWork(): Result {
-        val isLocation = updateCurrentLocation()
+        val isLocation = repoCity.updateCurrentLocation()
         val dateChanged = checkDateChange()
         val isWeather = updateCurrentWeather(dateChanged)
         return if (isLocation && isWeather) {
@@ -61,20 +59,7 @@ class DataUpdateWorker @AssistedInject constructor(
     private suspend fun updateCurrentWeather(forecast: Boolean): Boolean =
         repoWeather.getWeatherAll(forecast)
 
-    private suspend fun updateCurrentLocation(): Boolean {
-        val locationProvider = LocationProvider(applicationContext)
-        val location = locationProvider.getLastKnownLocation()
-        val checkPermission = CheckPermission()
-        return if (checkPermission.checkLocationPermission(applicationContext)) {
-            if (location == null) {
-                false
-            } else {
-                repoCity.setCurrentCity(location.latitude, location.longitude)
-            }
-        } else {
-            true
-        }
-    }
+
 
 }
 

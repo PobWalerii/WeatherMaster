@@ -3,7 +3,7 @@ package com.example.weathermaster.workmanager
 import android.content.Context
 import androidx.work.*
 
-object StartCityGetWorker {
+object CityStartWorker {
 
     fun cityGetWeatherWorker(context: Context, cityId: Long) {
 
@@ -13,7 +13,7 @@ object StartCityGetWorker {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-        val workRequest = OneTimeWorkRequest.Builder(DataCityGetWorker::class.java)
+        val workRequest = OneTimeWorkRequest.Builder(CityGetDataWorker::class.java)
             .setInputData(inputData)
             .setConstraints(constraints)
             .build()
@@ -24,4 +24,26 @@ object StartCityGetWorker {
                 workRequest
             )
     }
+
+
+    fun getCurrentCityWorker(context: Context) {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequest.Builder(CityGetCurrentWorker::class.java)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork(
+                "current_city",
+                ExistingWorkPolicy.REPLACE,
+                workRequest
+            )
+
+    }
+
+
 }

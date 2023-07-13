@@ -8,7 +8,6 @@ import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.repository.RepoCity
 import com.example.weathermaster.data.repository.RepoWeather
 import com.example.weathermaster.data.repository.Repository
-import com.example.weathermaster.notification.NotificationManager
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.utils.KeyConstants
 import dagger.Module
@@ -45,7 +44,6 @@ object DatabaseModule {
         appSettings: AppSettings,
         repoCity: RepoCity,
         repoWeather: RepoWeather,
-        notificationManager: NotificationManager,
         @ApplicationContext applicationContext: Context,
     ): Repository {
         return Repository(weatherDao,
@@ -53,7 +51,6 @@ object DatabaseModule {
             appSettings,
             repoCity,
             repoWeather,
-            notificationManager,
             applicationContext)
     }
 

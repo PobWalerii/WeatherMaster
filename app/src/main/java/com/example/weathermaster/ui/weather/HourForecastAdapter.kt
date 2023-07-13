@@ -42,7 +42,7 @@ class HourForecastAdapter: RecyclerView.Adapter<HourForecastAdapter.ViewHolder>(
     }
 
     fun getItems(start: Int, end: Int): List<ForecastWeatherHour> {
-        return if(listHour.size == 0) emptyList() else listHour.subList(start, end)
+        return if(!( start >= 0 && itemCount != 0)) emptyList() else listHour.subList(start, end)
     }
 
 }

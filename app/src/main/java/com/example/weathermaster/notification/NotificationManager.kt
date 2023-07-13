@@ -1,6 +1,7 @@
 package com.example.weathermaster.notification
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -40,11 +41,18 @@ class NotificationManager @Inject constructor(
         }
     }
 
+    fun setNotification(): Notification {
+        return NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.small)
+            .build()
+    }
+
     fun updateNotificationContent(current: CityAndWeatherFormated) {
         val image = LoadImage.loadImageFromUrl(
             KeyConstants.IMAGE_URL + current.icon + KeyConstants.IMAGE_EXTENSION,
             context
         )
+
         notificationManager.cancel(NOTIFICATION_ID)
         val updatedNotification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.small)
@@ -54,6 +62,7 @@ class NotificationManager @Inject constructor(
             .setOngoing(true)
             .build()
         notificationManager.notify(NOTIFICATION_ID, updatedNotification)
+
     }
 
 }

@@ -1,34 +1,29 @@
 package com.example.weathermaster.workmanager
 
-import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.work.*
+import com.example.weathermaster.notification.NotificationService
 import com.example.weathermaster.settings.AppSettings
-import com.example.weathermaster.permission.CheckPermission
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DataUpdateManager @Inject constructor(
+    private val appSettings: AppSettings,
     private val applicationContext: Context,
-    private val appSettings: AppSettings
 ){
 
-    private var startApp = true
-    private val checkPermission = CheckPermission()
-
-    fun init(activity: Activity) {
-        val permissionGranted = checkPermission.checkLocationPermission(activity)
-        if (!permissionGranted && startApp) {
-            startApp = false
-            checkPermission.requestLocationPermission(activity)
-        } else {
-            startService()
-            //appSettings.setIsServiceStatus()
-        }
+    fun start(permission: Boolean) {
+        appSettings.setPermission(permission)
+        appSettings.setIsStarted(true)
+        startDataUpdate()
+        startService()
     }
-    private fun startService() {
+
+    private fun startDataUpdate() {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -44,5 +39,16 @@ class DataUpdateManager @Inject constructor(
             dataUpdateRequest
         )
     }
+
+    private fun startService() {
+        val serviceIntent = createServiceIntent()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            applicationContext.startForegroundService(serviceIntent)
+        } else {
+            applicationContext.startService(serviceIntent)
+        }
+    }
+
+    private fun createServiceIntent() = Intent(applicationContext, NotificationService::class.java)
 
 }

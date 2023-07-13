@@ -7,7 +7,7 @@ import com.example.weathermaster.data.database.entity.City
 import com.example.weathermaster.data.database.entity.CurrentWeather
 import com.example.weathermaster.data.database.entity.ForecastWeather
 
-@Database(entities = [City::class, CurrentWeather::class, ForecastWeather::class], version = 11, exportSchema = false)
+@Database(entities = [City::class, CurrentWeather::class, ForecastWeather::class], version = 13, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun weatherDao(): WeatherDao
 }

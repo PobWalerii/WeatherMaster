@@ -9,7 +9,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class DataCityGetWorker  @AssistedInject constructor(
+class CityGetDataWorker  @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val repoWeather: RepoWeather,

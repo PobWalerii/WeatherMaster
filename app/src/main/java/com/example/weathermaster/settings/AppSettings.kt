@@ -18,31 +18,28 @@ class AppSettings(
     private val _measurement = MutableStateFlow(0)
     val measurement: StateFlow<Int> = _measurement.asStateFlow()
 
-    private val _isConnectStatus = MutableStateFlow(false)
-    val isConnectStatus: StateFlow<Boolean> = _isConnectStatus.asStateFlow()
+    private val _isPermission = MutableStateFlow(true)
+    val isPermission: StateFlow<Boolean> = _isPermission.asStateFlow()
 
-    //private val _isServiceStatus = MutableStateFlow(false)
-    //val isServiceStatus: StateFlow<Boolean> = _isServiceStatus.asStateFlow()
+    private val _isStartedApp = MutableStateFlow(false)
+    val isStartedApp: StateFlow<Boolean> = _isStartedApp.asStateFlow()
 
     private var sPref: SharedPreferences = applicationContext.getSharedPreferences("MyPref", AppCompatActivity.MODE_PRIVATE)
 
     private val _isLoadedPreferences = MutableStateFlow(false)
     val isLoadedPreferences: StateFlow<Boolean> = _isLoadedPreferences.asStateFlow()
 
-    fun init() {
+    init {
         getPreferences()
     }
 
-    fun close() {
+    fun setPermission(permission: Boolean) {
+        _isPermission.value = permission
     }
 
-    fun setIsConnectStatus(state: Boolean) {
-        _isConnectStatus.value = state
+    fun setIsStarted(isStarted: Boolean) {
+        _isStartedApp.value = isStarted
     }
-
-    //fun setIsServiceStatus() {
-    //    _isServiceStatus.value = true
-    //}
 
     private fun getPreferences() {
         _isLoadedPreferences.value = false

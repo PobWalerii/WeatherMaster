@@ -1,15 +1,10 @@
 package com.example.weathermaster.ui.weather
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +15,7 @@ import com.example.weathermaster.data.database.entity.CityAndWeatherFormated
 import com.example.weathermaster.data.database.entity.ForecastWeatherDay
 import com.example.weathermaster.data.database.entity.ForecastWeatherHour
 import com.example.weathermaster.databinding.FragmentWeatherBinding
+import com.example.weathermaster.utils.AnimSubstitution.startAnim
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.github.mikephil.charting.components.Description
@@ -63,6 +59,7 @@ class WeatherFragment : Fragment() {
         setupChart()
         observeScreenState()
         setupSettingsClickListener()
+        setupHomeClickListener()
         setupCityButtonClickListener()
         setItemClickListener()
         setupDetailClickListener()
@@ -83,6 +80,8 @@ class WeatherFragment : Fragment() {
                         val selectedCityAndWeather = state.selectedCityAndWeather
                         val selectedCityForecastDay = state.selectedCityForecastDay
                         val selectedCityForecastHour = state.selectedCityForecastHour
+                        val isPermission = state.isPermission
+                        updatePermissionState(isPermission)
                         updateCurrentData(selectedCityAndWeather)
                         updateCityListData(cityAndWeatherList)
                         updateForecastDay(selectedCityForecastDay)
@@ -91,6 +90,10 @@ class WeatherFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun updatePermissionState(isPermission: Boolean) {
+        binding.isPermission = isPermission
     }
 
     private fun updateForecastHour(detail: List<ForecastWeatherHour>) {
@@ -108,46 +111,23 @@ class WeatherFragment : Fragment() {
     }
 
     private fun updateForecastDay(forecast: List<ForecastWeatherDay>) {
-        if(forecast.isNotEmpty()) {
             binding.forecast = forecast[0]
             binding.line1.forecast = forecast[1]
             binding.line2.forecast = forecast[2]
             binding.line3.forecast = forecast[3]
-        }
     }
 
     private fun setupDetailClickListener() {
         binding.detail.setOnClickListener {
             observeForecastHour()
-            val fadeOut = ObjectAnimator.ofFloat(binding.forecastDay, "alpha", 1f, 0f)
-            fadeOut.duration = 300
-            fadeOut.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.forecastDay.visibility = GONE
-                    binding.forecastHour.visibility = VISIBLE
-                    val fadeIn = ObjectAnimator.ofFloat(binding.forecastHour, "alpha", 0f, 1f)
-                    fadeIn.duration = 300
-                    fadeIn.start()
-                }
-            })
-            fadeOut.start()
+            startAnim(binding.forecastDay, binding.forecastHour)
         }
     }
+
     private fun setupHourArrowClickListener() {
         binding.arrowHour.setOnClickListener {
             unsubscribeForecastHour()
-            val fadeOut = ObjectAnimator.ofFloat(binding.forecastHour, "alpha", 1f, 0f)
-            fadeOut.duration = 300
-            fadeOut.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.forecastHour.visibility = GONE
-                    binding.forecastDay.visibility = VISIBLE
-                    val fadeIn = ObjectAnimator.ofFloat(binding.forecastDay, "alpha", 0f, 1f)
-                    fadeIn.duration = 300
-                    fadeIn.start()
-                }
-            })
-            fadeOut.start()
+            startAnim(binding.forecastHour, binding.forecastDay)
         }
     }
 
@@ -157,6 +137,12 @@ class WeatherFragment : Fragment() {
                 viewModel.setCurrentId(currentId)
             }
         })
+    }
+
+    private fun setupHomeClickListener() {
+        binding.home.setOnClickListener {
+            viewModel.setCurrentId(1L)
+        }
     }
 
     private fun observeForecastHour() {
@@ -172,14 +158,9 @@ class WeatherFragment : Fragment() {
         val layoutManager = recyclerHour.layoutManager as LinearLayoutManager
         val start = layoutManager.findFirstVisibleItemPosition()
         val end = layoutManager.findLastVisibleItemPosition()
-
-        if ( start >= 0 && adapterHour.itemCount != 0) {
-            val visibleItems = adapterHour.getItems(start, end)
-            if (visibleItems.isNotEmpty()) {
-                val entries = getChartData(visibleItems)
-                refreshChart(entries)
-            }
-        }
+        val visibleItems = adapterHour.getItems(start, end)
+        val entries = getChartData(visibleItems)
+        refreshChart(entries)
     }
 
     private fun getChartData(visibleItems: List<ForecastWeatherHour>): List<Entry> {

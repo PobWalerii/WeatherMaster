@@ -1,7 +1,6 @@
 package com.example.weathermaster.data.repository
 
 import android.content.Context
-import android.widget.Toast
 import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.LocationItem
@@ -9,6 +8,8 @@ import com.example.weathermaster.data.database.entity.SearchListItem
 import com.example.weathermaster.data.database.dao.WeatherDao
 import com.example.weathermaster.data.database.entity.City
 import com.example.weathermaster.data.mapers.Mapers
+import com.example.weathermaster.geolocation.LocationProvider
+import com.example.weathermaster.permission.CheckPermission
 import com.example.weathermaster.utils.KeyConstants
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -44,6 +45,21 @@ class RepoCity @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    suspend fun updateCurrentLocation(): Boolean {
+        val checkPermission = CheckPermission()
+        return if (checkPermission.checkLocationPermission(applicationContext)) {
+            val locationProvider = LocationProvider(applicationContext)
+            val location = locationProvider.getLastKnownLocation()
+            if (location == null) {
+                false
+            } else {
+                setCurrentCity(location.latitude, location.longitude)
+            }
+        } else {
+            true
         }
     }
 
@@ -85,9 +101,6 @@ class RepoCity @Inject constructor(
             )[0]
             Mapers.getCityFromResponse(response, languageCode)
         } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
-            }
             null
         }
     }

@@ -17,10 +17,10 @@ object BackgroundModule {
     @Singleton
     @Provides
     fun provideDataUpdateManager(
+        appSettings: AppSettings,
         @ApplicationContext applicationContext: Context,
-        appSettings: AppSettings
     ): DataUpdateManager {
-        return DataUpdateManager(applicationContext,  appSettings)
+        return DataUpdateManager(appSettings, applicationContext)
     }
 
 }

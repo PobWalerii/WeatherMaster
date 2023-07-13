@@ -12,11 +12,13 @@ import com.example.weathermaster.data.mapers.Mapers.forecastToForecastWeatherDay
 import com.example.weathermaster.data.mapers.Mapers.forecastToForecastWeatherHour
 import com.example.weathermaster.data.mapers.Mapers.toCityList
 import com.example.weathermaster.data.mapers.Mapers.weaterToWeaterFormated
-import com.example.weathermaster.notification.NotificationManager
+import com.example.weathermaster.geolocation.LocationProvider
 import com.example.weathermaster.settings.AppSettings
 import com.example.weathermaster.ui.citysearch.SearchCityState
 import com.example.weathermaster.utils.KeyConstants.API_KEY
-import com.example.weathermaster.workmanager.StartCityGetWorker.cityGetWeatherWorker
+import com.example.weathermaster.utils.NetworkStatus.connectStatus
+import com.example.weathermaster.workmanager.CityStartWorker.cityGetWeatherWorker
+import com.example.weathermaster.workmanager.CityStartWorker.getCurrentCityWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -29,12 +31,9 @@ class Repository @Inject constructor(
     appSettings: AppSettings,
     private val repoCity: RepoCity,
     private val repoWeather: RepoWeather,
-    private val notificationManager: NotificationManager,
     private val applicationContext: Context,
 ) {
 
-    //private val isConnectStatus: StateFlow<Boolean> = appSettings.isConnectStatus
-    //private val isServiceStatus: StateFlow<Boolean> = appSettings.isServiceStatus
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
 
     val measurement: StateFlow<Int> = appSettings.measurement
@@ -42,7 +41,7 @@ class Repository @Inject constructor(
     val listCityAndWeather: Flow<List<CityAndWeatherFormated>> = weatherDao.getCityAndWeatherList()
         .map { list ->
             list.map {
-                weaterToWeaterFormated(it, measurement.value)
+                weaterToWeaterFormated(it, measurement.value, applicationContext)
             }
         }
 
@@ -56,21 +55,52 @@ class Repository @Inject constructor(
             forecastToForecastWeatherDay(list, measurement.value)
         }
 
+    val currentData: Flow<CityAndWeatherFormated> = listCityAndWeather
+        .map { list ->
+            list[0]
+        }
+
     private val _addCityResult = MutableStateFlow(false)
     val addCityResult: StateFlow<Boolean> = _addCityResult
 
     private val _searchState = MutableStateFlow<SearchCityState>(SearchCityState.Loaded)
     val searchState: StateFlow<SearchCityState> = _searchState
 
+    val isPermission: StateFlow<Boolean> = appSettings.isPermission
+    val isStartedApp: StateFlow<Boolean> = appSettings.isStartedApp
+
     fun init() {
-        showNotification()
+        checkCurrentLocation()
     }
 
-    private fun showNotification() {
-        CoroutineScope(Dispatchers.Default).launch {
-            listCityAndWeather.distinctUntilChanged().collect { list ->
-                if (list.isNotEmpty()) {
-                    notificationManager.updateNotificationContent(list[0])
+    private fun checkCurrentLocation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            isStartedApp.collect {
+                if (it) {
+                    if( !connectStatus(applicationContext) ) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                applicationContext,
+                                R.string.text_no_internet,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                    if( isPermission.value ) {
+                        val locationProvider = LocationProvider(applicationContext)
+                        val location = locationProvider.getLastKnownLocation()
+                        if (location != null) {
+                            if (repoCity.setCurrentCity(location.latitude, location.longitude)) {
+                                if (!repoWeather.getCityWeather(1L)) {
+                                    cityGetWeatherWorker(applicationContext, 1L)
+                                }
+                            } else {
+                                getCurrentCityWorker(applicationContext)
+                            }
+                        } else {
+                            getCurrentCityWorker(applicationContext)
+                        }
+                    }
                 }
             }
         }
@@ -95,7 +125,15 @@ class Repository @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                _searchState.value = SearchCityState.Error(e.message.toString())
+                _searchState.value = SearchCityState.Error(
+                    applicationContext.getString(
+                        if (connectStatus(applicationContext)) {
+                            R.string.no_servise_connect
+                        } else {
+                            R.string.text_need_internet
+                        }
+                    )
+                )
             } finally {
                 _searchState.value = SearchCityState.Loaded
             }

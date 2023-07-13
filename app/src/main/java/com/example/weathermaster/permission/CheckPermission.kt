@@ -5,10 +5,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.weathermaster.R
 
 class CheckPermission {
 
@@ -32,15 +30,11 @@ class CheckPermission {
 
     fun requestLocationPermission(activity: Activity) {
         val permission = arrayOf(
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
         val permissionRequested =
             ActivityCompat.shouldShowRequestPermissionRationale(activity, permission[0])
-        if (permissionRequested) {
-            Toast.makeText(activity, activity.getString(R.string.permission), Toast.LENGTH_SHORT)
-                .show()
-        } else {
+        if (!permissionRequested) {
             ActivityCompat.requestPermissions(
                 activity,
                 permission,

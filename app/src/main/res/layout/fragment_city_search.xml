@@ -1,100 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="isLoadData"
             type="Boolean" />
     </data>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/gradient"
-    tools:context=".ui.citysearch.CitySearchFragment">
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_title_top"
-        android:text="@string/search"
-        android:textColor="@color/white"
-        android:textSize="@dimen/title_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/arrow"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_marginStart="@dimen/margin_image_horisontal"
-        android:src="@drawable/arrow_back"
-        app:layout_constraintBottom_toBottomOf="@+id/title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/title"
-        tools:ignore="ContentDescription" />
-
-    <EditText
-        android:id="@+id/textSearch"
-        style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox.Dense"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginHorizontal="@dimen/searh_margin_horizontal"
-        android:layout_marginTop="@dimen/searh_margin_top"
-        android:background="@drawable/forecast_back"
-        android:imeOptions="actionDone"
-        android:importantForAutofill="no"
-        android:inputType="textPersonName"
-        android:textColor="@color/black"
-        android:textSize="@dimen/text_searh_size"
-        tools:ignore="LabelFor,Suspicious0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintEnd_toStartOf="@+id/search"/>
-
-    <ImageView
-        android:id="@+id/search"
-        style="@android:style/Widget.Toolbar.Button.Navigation"
-        android:layout_width="@dimen/search_button_size"
-        android:layout_height="@dimen/search_button_size"
-        android:gravity="center"
-        android:background="@drawable/forecast_back"
-        android:layout_marginEnd="@dimen/searh_margin_horizontal"
-        android:src="@drawable/search"
-        app:layout_constraintTop_toTopOf="@+id/textSearch"
-        app:layout_constraintBottom_toBottomOf="@+id/textSearch"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="@dimen/recycler_margin_horizontal"
-        android:layout_marginTop="@dimen/searh_margin_top"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textSearch"/>
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient"
+        tools:context=".ui.citysearch.CitySearchFragment">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="@dimen/progress_size"
-        android:layout_height="@dimen/progress_size"
-        android:visibility="@{isLoadData ? View.VISIBLE : View.GONE}"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_title_top"
+            android:text="@string/search"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_marginStart="@dimen/margin_image_horisontal"
+            android:src="@drawable/arrow_back"
+            app:layout_constraintBottom_toBottomOf="@+id/title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/title"
+            tools:ignore="ContentDescription" />
 
+        <EditText
+            android:id="@+id/textSearch"
+            style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/searh_margin_horizontal"
+            android:layout_marginTop="@dimen/searh_margin_top"
+            android:layout_weight="1"
+            android:background="@drawable/forecast_back"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_searh_size"
+            app:layout_constraintEnd_toStartOf="@+id/search"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            tools:ignore="LabelFor,Suspicious0dp" />
+
+        <ImageView
+            android:id="@+id/search"
+            style="@android:style/Widget.Toolbar.Button.Navigation"
+            android:layout_width="@dimen/search_button_size"
+            android:layout_height="@dimen/search_button_size"
+            android:layout_marginEnd="@dimen/searh_margin_horizontal"
+            android:background="@drawable/forecast_back"
+            android:gravity="center"
+            android:src="@drawable/search"
+            app:layout_constraintBottom_toBottomOf="@+id/textSearch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textSearch"
+            tools:ignore="ContentDescription" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="@dimen/recycler_margin_horizontal"
+            android:layout_marginTop="@dimen/searh_margin_top"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textSearch" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="@dimen/progress_size"
+            android:layout_height="@dimen/progress_size"
+            android:visibility="@{isLoadData ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -1,6 +1,8 @@
 package com.example.weathermaster.data.mapers
 
+import android.content.Context
 import android.os.Build
+import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
 import com.example.weathermaster.data.apiservice.response.Location
@@ -79,13 +81,13 @@ object Mapers {
         )
     }
 
-    fun weaterToWeaterFormated(it: CityAndWeather, measurement: Int): CityAndWeatherFormated {
+    fun weaterToWeaterFormated(it: CityAndWeather, measurement: Int, context: Context): CityAndWeatherFormated {
 
         val tempSimbol = listOf("K","\u2103","\u2109")[measurement-1]
         val speedSimbol = listOf(" m/s"," m/s"," mph")[measurement-1]
         val pressureSimbol = " hPa"
         val humiditySimbol = " %"
-
+        val emptyCity = it.id == 1L && it.cityName == context.getString(R.string.my_city)
         return CityAndWeatherFormated(
             it.id,
             it.number,
@@ -95,11 +97,11 @@ object Mapers {
             it.country,
             it.countryName,
             it.state,
-            ((convertTemp(it.temp, measurement) * 10.0).roundToLong() / 10.0).toString(),
-            tempSimbol,
+            if(emptyCity) "" else ((convertTemp(it.temp, measurement) * 10.0).roundToLong() / 10.0).toString(),
+            if(emptyCity) "" else tempSimbol,
             it.description ?: "",
             it.icon ?: "",
-            "Pressure " + it.pressure.toString() + pressureSimbol +
+            if(emptyCity) "" else "Pressure " + it.pressure.toString() + pressureSimbol +
                     "\nHumidity " + it.humidity.toString() + humiditySimbol +
                     "\nWind: Speed " + ((convertSpeed(it.windSpeed, measurement) * 10.0).roundToLong() / 10.0).toString() + speedSimbol +
                     ", Gust " + ((convertSpeed(it.windGust, measurement) * 10.0).roundToLong() / 10.0).toString() + speedSimbol

@@ -83,7 +83,7 @@ class CitySearchFragment : Fragment() {
         Toast.makeText(context, R.string.empty_search, Toast.LENGTH_SHORT).show()
     }
     private fun showError(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun setupAdapter() {

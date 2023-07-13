@@ -13,10 +13,11 @@
     <string name="empty_search">No results found for your search</string>
     <string name="city_already">This city is already listed</string>
     <string name="text_no_internet">There Is No Internet. It Needs a Connection to Work.</string>
+    <string name="text_need_internet">There Is No Internet Connection. Check The appropriate Settings And Try Again.</string>
+    <string name="no_servise_connect">There Was a Problem Connecting To the Service. Please Try again Later.</string>
+    <string name="need_permission">To display weather information for your location, you must grant the appropriate permission.</string>
+    <string name="foreground">Foreground Service</string>
 
-    <string name="permission">To ensure proper app functionality, permission to access location is required.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

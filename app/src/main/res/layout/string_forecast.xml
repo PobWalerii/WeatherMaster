@@ -39,7 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/forecast_margin"
-            android:inputType="textMultiLine"
+            android:inputType="textMultiLine|textNoSuggestions"
             android:maxLines="2"
             android:text='@{forecast.description}'
             android:textColor="@color/white"
@@ -63,4 +63,5 @@
             app:layout_constraintBottom_toBottomOf="@+id/weather_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

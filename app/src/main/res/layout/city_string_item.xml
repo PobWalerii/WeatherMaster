@@ -39,14 +39,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{item.temp+item.tempSimbol}"
-                android:visibility="@{item.icon.isEmpty ? View.GONE : View.VISIBLE}"
+                android:text='@{item.icon.isEmpty ? "" : item.temp+item.tempSimbol}'
                 android:textSize="@dimen/item_info_size" />
 
             <ImageView
                 android:layout_width="@dimen/forecast_ico_size"
                 android:layout_height="wrap_content"
                 app:showIcon="@{item.icon}"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/forecast_ico_size"
+                android:src="@drawable/location"
+                android:visibility="@{item.icon.isEmpty ? View.VISIBLE : View.GONE}"
                 tools:ignore="ContentDescription" />
 
         </LinearLayout>

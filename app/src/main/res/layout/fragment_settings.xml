@@ -6,11 +6,13 @@
     <data>
 
         <import type="com.example.weathermaster.utils.KeyConstants" />
+
         <import type="android.view.View" />
 
         <variable
             name="measurement"
             type="Integer" />
+
         <variable
             name="isEdited"
             type="Boolean" />
@@ -49,13 +51,13 @@
             android:id="@+id/save"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
-            android:padding="@dimen/button_padding"
             android:layout_marginEnd="@dimen/margin_image_horisontal"
+            android:padding="@dimen/button_padding"
             android:src="@drawable/save"
-            app:visibility="@{isEdited ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="@+id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/title"
+            app:visibility="@{isEdited ? View.VISIBLE : View.INVISIBLE}"
             tools:ignore="ContentDescription" />
 
         <LinearLayout
@@ -138,10 +140,6 @@
                 android:background="@color/white" />
 
         </LinearLayout>
-
-
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

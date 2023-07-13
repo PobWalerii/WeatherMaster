@@ -1,6 +1,7 @@
 package com.example.weathermaster.data.repository
 
 import android.content.Context
+import com.example.weathermaster.R
 import com.example.weathermaster.data.apiservice.ApiService
 import com.example.weathermaster.data.apiservice.response.Current
 import com.example.weathermaster.data.apiservice.response.Forecast
@@ -20,7 +21,7 @@ import javax.inject.Singleton
 class RepoWeather @Inject constructor(
     private val weatherDao: WeatherDao,
     private val apiService: ApiService,
-    applicationContext: Context,
+    private val applicationContext: Context,
 ) {
 
     private val languageCode: String = applicationContext.resources.configuration.locales.get(0).language
@@ -29,9 +30,11 @@ class RepoWeather @Inject constructor(
         val cityList = weatherDao.loadCityList()
         var isSuccess = true
         cityList.map { city ->
-            if (!getWeather(city, isForecast)) {
-                isSuccess = false
-                return@map
+            if (!(city.id == 1L && city.cityName == applicationContext.getString(R.string.my_city))) {
+                if (!getWeather(city, isForecast)) {
+                    isSuccess = false
+                    return@map
+                }
             }
         }
         return isSuccess

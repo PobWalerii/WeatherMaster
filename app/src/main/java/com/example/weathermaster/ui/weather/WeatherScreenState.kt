@@ -10,6 +10,7 @@ sealed class WeatherScreenState {
         val currentCityList: List<CityAndWeatherFormated>,
         val selectedCityAndWeather: CityAndWeatherFormated?,
         val selectedCityForecastDay: List<ForecastWeatherDay>,
-        val selectedCityForecastHour: List<ForecastWeatherHour>
+        val selectedCityForecastHour: List<ForecastWeatherHour>,
+        val isPermission: Boolean
     ) : WeatherScreenState()
 }

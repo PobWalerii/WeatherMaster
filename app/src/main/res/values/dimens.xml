@@ -2,26 +2,32 @@
 <resources>
     <dimen name="title_size">24sp</dimen>
     <dimen name="margin_title_top">25dp</dimen>
-    <dimen name="margin_image_horisontal">25dp</dimen>
+    <dimen name="margin_image_horisontal">20dp</dimen>
+    <dimen name="margin_image_top">3dp</dimen>
+    <dimen name="margin_title_horisontal">10dp</dimen>
     <dimen name="margin_settings_vertical">10dp</dimen>
     <dimen name="settings_text_size">20sp</dimen>
     <dimen name="settings_comment_size">15sp</dimen>
     <dimen name="margin_comment_top">-10dp</dimen>
     <dimen name="button_size">30dp</dimen>
     <dimen name="button_padding">2dp</dimen>
+    <dimen name="description_margin_top">200dp</dimen>
+    <dimen name="empty_city_image_size">250dp</dimen>
+    <dimen name="empty_city_text_size">18sp</dimen>
+    <dimen name="empty_city_text_margin">55dp</dimen>
 
     <dimen name="current_temp_size">110sp</dimen>
-    <dimen name="current_temp_margin_top">40dp</dimen>
+    <dimen name="current_temp_margin_top">60dp</dimen>
     <dimen name="current_simbol_size">80sp</dimen>
     <dimen name="current_info_size">18sp</dimen>
     <dimen name="current_ico_size">100dp</dimen>
     <dimen name="current_content_size">16sp</dimen>
-    <dimen name="other_margin_top">90dp</dimen>
+    <dimen name="other_margin_top">85dp</dimen>
 
     <dimen name="forecast_layout_size">220dp</dimen>
     <dimen name="forecast_ico_size">40dp</dimen>
     <dimen name="forecast_margin">10dp</dimen>
-    <dimen name="forecast_margin_top">25dp</dimen>
+    <dimen name="forecast_margin_top">410dp</dimen>
     <dimen name="forecast_elevation">0dp</dimen>
     <dimen name="detail_margin_bottom">20dp</dimen>
 
